@@ -2,7 +2,6 @@ import unittest
 import json
 from app import app
 
-
 class test_incident(unittest.TestCase):
     def setUp(self):
         self.client = app.test_client()

@@ -1,8 +1,8 @@
 import psycopg2
-# import os
+import os
 
 #base db url
-base_url = "dbname=ireporter host=localhost port=5432 user=elishamisoi password=postgres"
+base_url = os.getenv('DATABASE_URL')
 # dsn = "dbname=ireporter user=user password=password host=localhost"
 
 #test db url
