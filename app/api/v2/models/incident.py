@@ -40,7 +40,7 @@ class Incident:
             "status": 201,
             "data": incident,
             "message": "Created " + incident_type + " record"
-        }), 200
+        }), 201
 
         return response
     
