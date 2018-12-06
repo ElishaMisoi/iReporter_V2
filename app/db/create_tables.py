@@ -6,13 +6,13 @@ QUERIES = [
           id SERIAL PRIMARY KEY NOT NULL,
           firstname VARCHAR NOT NULL,
           lastname VARCHAR NOT NULL,
-          othernames VARCHAR NOT NULL,
+          othernames VARCHAR NULL,
           email VARCHAR NOT NULL,
           phoneNumber VARCHAR NOT NULL,
-          username VARCHAR NOT NULL,
+          username VARCHAR NOT NULL UNIQUE,
           password VARCHAR NOT NULL,
-          registered TIMESTAMP,
-          isAdmin BOOLEAN
+          registered TIMESTAMP WITHOUT TIME ZONE DEFAULT (NOW() AT TIME ZONE 'utc'),
+          isAdmin BOOLEAN default False
           )
   """,
 

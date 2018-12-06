@@ -1,9 +1,9 @@
 from flask import Flask, jsonify, request
-from app.api.v1.models.incident import Incident
+from app.api.v2.models.incident import Incident
 from datetime import datetime
-from app.api.v1.common.validator import email, required
+from app.api.v2.common.validator import email, required
 from marshmallow import ValidationError, Schema, fields
-from app.api.v1.views import api
+from app.api.v2.views import api
 
 incidents_list = []
 

@@ -1,5 +1,5 @@
 env:
-  - DATABASE_URL="dbname=ireporter host=localhost port=5432 user=elishamisoi password=postgres"
+  - DATABASE_URL="dbname=ireporter host=localhost user=elishamisoi password=postgres"
 language: python
 python:
   - "3.6"
