@@ -18,7 +18,7 @@ Corruption is a huge bane to Africa’s development. African countries must deve
 
 ## Demo
 
-Project API demo is hosted at [Heroku](https://ireporter-api-v1.herokuapp.com)
+Project API demo is hosted at [Heroku](https://ireporter-v2.herokuapp.com/)
 
 ### API endpoints
 
