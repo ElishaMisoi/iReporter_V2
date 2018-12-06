@@ -9,8 +9,8 @@ class Incident:
     # incident class
     def __init__(self, createdBy, type, location,
                  status, Images, Videos, comment):
-        self.createdBy = createdBy
-        self.type = type
+        self.createdBy = createdBy 
+        self.type = type 
         self.location = location
         self.status = status
         self.Images = Images
