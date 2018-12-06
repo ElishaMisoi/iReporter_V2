@@ -18,19 +18,7 @@ def authenticate(func):
             return response
         
         jwt_token = request.headers['Authorization']
-        conn = open_connection()
-        cur = conn.cursor()
-        cur.execute("select token from blacklist where token = '{}'".format(jwt_token))
-        blacklisted = cur.fetchone()
-
-        if blacklisted:
-            response = jsonify({
-                "message": "Account logged out. Please log in to continue"
-            })
-            response.status_code = 401
-            cur.close()
-            close_connection(conn)
-            return response
+  
 
         try:
             identity = jwt.decode(jwt_token, 'secret')['sub']

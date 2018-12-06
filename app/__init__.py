@@ -2,9 +2,11 @@ from flask import Flask
 # from flask_cors import CORS
 from app.db import create_tables
 
+#create_tables.drop_tables()
 create_tables.create_tables()
 app = Flask(__name__)
 # CORS(app)
+
 
 app.url_map.strict_slashes = False
 

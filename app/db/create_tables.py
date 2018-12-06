@@ -24,8 +24,8 @@ QUERIES = [
           type VARCHAR NOT NULL,
           location VARCHAR NOT NULL,
           status VARCHAR NOT NULL,
-          Images VARCHAR[] NOT NULL,
-          Videos VARCHAR[] NOT NULL,
+          Images VARCHAR NULL,
+          Videos VARCHAR NULL,
           comment VARCHAR NOT NULL
           )
   """
