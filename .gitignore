@@ -5,5 +5,4 @@ __pycache__/
 .idea/
 .coverage
 .vscode
-.coveralls.yml
 .env
