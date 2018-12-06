@@ -1,6 +1,6 @@
 # iReporter_V2
 
-[![Build Status](https://travis-ci.org/Elisha-Misoi/iReporter_V2.svg?branch=develop)](https://travis-ci.org/Elisha-Misoi/iReporter_V2) [![![Coverage Status](https://coveralls.io/repos/github/Elisha-Misoi/iReporter_V2/badge.svg?branch=develop)](https://coveralls.io/github/Elisha-Misoi/iReporter_V2?branch=develop)
+[![Build Status](https://travis-ci.org/Elisha-Misoi/iReporter_V2.svg?branch=develop)](https://travis-ci.org/Elisha-Misoi/iReporter_V2) [![Coverage Status](https://coveralls.io/repos/github/Elisha-Misoi/iReporter_V2/badge.svg?branch=develop)](https://coveralls.io/github/Elisha-Misoi/iReporter_V2?branch=develop)
 [![Maintainability](https://api.codeclimate.com/v1/badges/24e20c83fead01ef634c/maintainability)](https://codeclimate.com/github/Elisha-Misoi/iReporter_V2/maintainability)
 
 Corruption is a huge bane to Africa’s development. African countries must develop novel and localised solutions that will curb this menace, hence the birth of iReporter. iReporter enables any/every citizen to bring any form of corruption to the notice of appropriate authorities and the general public. Users can also report on things that needs government intervention.
