@@ -68,7 +68,7 @@ def get_interventions(identity):
     return get_incidents('intervention', identity)
 
 
-@api.route('/red-flags', methods=['GET'])
+@api.route('/redflags', methods=['GET'])
 @authenticate
 def get_redflags(identity):
     # getting all redflags
@@ -336,6 +336,7 @@ def delete_incident(incident_id, type):
 def isAdmin(user_id):
     cur.execute("select * from users where id = '{}'".format(user_id))
     user = cur.fetchone()
+    print(user)
     return user[9]
 
 def verified(user_id):

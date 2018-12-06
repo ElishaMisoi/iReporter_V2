@@ -170,4 +170,18 @@ class UserTests(unittest.TestCase):
                                   content_type='application/json')
         self.assertEqual(result.status_code, 400)
 
-        
+    # def test_user_logout(self):
+    #     ''' Should log out user '''
+
+    #     token = self.auth()
+
+    #     # logout user
+    #     logout = self.client.post('/api/v2/auth/logout',
+    #                             headers=dict(Authorization=token))
+    #     self.assertEqual(logout.status_code, 200)
+
+    #     # test if token was blacklisted
+    #     req2 = self.client.get('/api/v2/questions',
+    #                         headers=dict(Authorization=token))
+
+    #     self.assertEqual(req2.status_code, 401)
