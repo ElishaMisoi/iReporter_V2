@@ -22,6 +22,15 @@ class SignInSchema(Schema):
     email = fields.Email(required=True, validate=(email))
     password = fields.Str(required=True, validate=(required))
 
+def email_exists(email):
+        """ Check if a user exists in the db """
+        conn = open_connection()
+        cur = conn.cursor()
+        cur.execute("SELECT * from users WHERE email='{}'".format(email))
+        user = cur.fetchone()
+        cur.close()
+        return user
+
 @api.route('/auth/signup', methods=['POST'])
 def create_user():
     # creating a user
@@ -42,13 +51,17 @@ def create_user():
         response = jsonify({"message": "The username taken"})
         response.status_code = 409
         return response
+    
+    if email_exists(data['email']):
+        response = jsonify({"message": "The email is already registered, try login in"})
+        response.status_code = 409
+        return response
 
     user = User(data['email'],data['password'])
 
-    register = user.signup(data['firstname'], data['lastname'],
+    register = user.signup(data['username'], data['firstname'], data['lastname'],
                 data['othernames'],data['phoneNumber'],
-                data['username'])
-    
+                )
     cur.close()
     close_connection(conn)
 

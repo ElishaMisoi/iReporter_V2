@@ -1,6 +1,8 @@
 from flask import Flask, jsonify, request
 from marshmallow import ValidationError, Schema, fields
+import datetime
 
+from app import app
 from app.api.v2.models.incident import Incident
 from app.api.v2.common.validator import email, required
 from app.api.v2.views import api
@@ -89,14 +91,13 @@ def get_incidents(type, identity):
         "message": "There are no " + type + "s"
         }), 200
 
-    cur.close()
     return jsonify({
         "status" : 200,
         "data": incidents
         }), 200
 
 
-@api.route('/red-flags/<int:redflag_id>/status', methods=['PATCH'])
+@api.route('/redflags/<int:redflag_id>/status', methods=['PATCH'])
 @authenticate
 def edit_redflag_status(identity, redflag_id):
     #editing status of a red-flag record
@@ -155,7 +156,7 @@ def edit_intervention_status(identity, intervention_id):
                 "status": 400}), 400
 
 
-@api.route('/red-flags/<int:redflag_id>/location', methods=['PATCH'])
+@api.route('/redflags/<int:redflag_id>/location', methods=['PATCH'])
 @authenticate
 def edit_redflag_location(identity, redflag_id):
     #editing location of a red-flag record
@@ -164,6 +165,11 @@ def edit_redflag_location(identity, redflag_id):
     if errors:
             return jsonify({
               "errors": errors, 
+              "status": 400}), 400
+
+    if not data['type'].strip(' '):
+            return jsonify({
+              "errors": "type cannot be null", 
               "status": 400}), 400
     
     if data['type'] == 'intervention':
@@ -185,6 +191,11 @@ def edit_intervention_location(identity, intervention_id):
               "errors": errors, 
               "status": 400}), 400
     
+    if not data['type'].strip(' '):
+            return jsonify({
+              "errors": "type cannot be null", 
+              "status": 400}), 400
+
     if data['type'] == 'red-flag':
         return jsonify({
               "errors": "You are trying to edit a red-flag record, use /red-flags/<int:redflag_id>/location endpoint instead", 
@@ -212,7 +223,7 @@ def edit_intervention_comment(identity, intervention_id):
     return edit_incident('comment', intervention_id, data['comment'], 'intervention', identity)
 
 
-@api.route('/red-flags/<int:redflag_id>/comment', methods=['PATCH'])
+@api.route('/redflags/<int:redflag_id>/comment', methods=['PATCH'])
 @authenticate
 def edit_redflag_comment(identity, redflag_id):
     #editing status of a red-flag record
@@ -231,25 +242,24 @@ def edit_redflag_comment(identity, redflag_id):
     return edit_incident('comment', redflag_id, data['comment'], 'red-flag', identity)
 
 
-def edit_incident(update_type, update_record, incident_id, type, indentity):
+def edit_incident(update_type, incident_id, update_record, type, indentity):
     #function for editing incidents
-    cur.execute("select * from incidents where id = '{}'".format(incident_id))
+    cur.execute("select * from incidents where id = '{}' and type = '{}'".format(incident_id, type))
     incident = cur.fetchone()
 
     if not incident:
         return jsonify({
-        "status" : 200,
+        "status" : 404,
         "message": "The " + type + " record was not found"
-        }), 200
-        
+        }), 404
+
     if verified(indentity) == True:
-        query = "update incidents set " + update_type + " = '{}' where id = {}".format(update_record, incident_id)
+        query = "update incidents set " + update_type + " = '{}' where id = '{}'".format(update_record, incident_id)
         cur.execute(query)
         cur.close()
-        conn.commit()
         return jsonify({
         "status" : 200,
-        "message": "Updated " + incident['type'] + " record " + update_type
+        "message": "Updated " + incident[3] + " record's " + update_type
         }), 200
     else:
         return jsonify({
@@ -258,30 +268,31 @@ def edit_incident(update_type, update_record, incident_id, type, indentity):
         }), 401
 
 
-
 @api.route('/redflags/<int:redflag_id>', methods=['GET'])
 @authenticate
 def get_single_redflag(identity, redflag_id):
     #getting a single redflag
-    return get_single_incident(redflag_id)
+    if verified(identity) == True:
+     return get_single_incident(redflag_id, 'red-flag')
 
 
 @api.route('/interventions/<int:intervention_id>', methods=['GET'])
 @authenticate
 def get_single_intervention(identity, intervention_id):
-    #getting a single redflag
-    return get_single_incident(intervention_id)
+    #getting a intervention redflag
+    if verified(identity) == True:
+     return get_single_incident(intervention_id, 'intervention')
 
 
-def get_single_incident(incident_id):
-    cur.execute("select * from incidents where id = '{}'".format(incident_id))
+def get_single_incident(incident_id, type):
+    cur.execute("select * from incidents where id = '{}' and type = '{}'".format(incident_id, type))
     incident = cur.fetchone()
 
     if not incident:
         return jsonify({
-        "status" : 200,
+        "status" : 404,
         "message": "The " + type + " record was not found"
-        }), 200
+        }), 404
 
     return jsonify({
     "status" : 200,
@@ -289,22 +300,23 @@ def get_single_incident(incident_id):
     }), 200
 
 
-@api.route('/redflags/<int:redflags_id>', methods=['GET'])
+@api.route('/redflags/<int:redflags_id>', methods=['DELETE'])
 @authenticate
 def delete_redflag(identity, redflags_id):
     #deleting a red-flag record 
-    return delete_incident(redflags_id, 'red-flag')
+    if verified(identity) == True:
+     return delete_incident(redflags_id, 'red-flag')
 
 
-@api.route('/interventions/<int:intervention_id>', methods=['GET'])
+@api.route('/interventions/<int:intervention_id>', methods=['DELETE'])
 @authenticate
 def delete_intervention(identity, intervention_id):
     #deleting an intervention record
-    return delete_incident(intervention_id, 'intervention')
-
+    if verified(identity) == True:
+     return delete_incident(intervention_id, 'intervention')
 
 def delete_incident(incident_id, type):
-    cur.execute("select * from incidents where id = '{}'".format(incident_id))
+    cur.execute("select * from incidents where id = '{}' and type = '{}'".format(incident_id, type))
     incident = cur.fetchone()
 
     if not incident:
@@ -313,7 +325,7 @@ def delete_incident(incident_id, type):
         "message": "The " + type + " record was not found"
         }), 200
 
-    cur.execute("delete * from incidents where id = {}".format(incident_id))
+    cur.execute("delete from incidents where id = '{}'".format(incident_id))
     cur.close()
     conn.commit()
     return jsonify({
@@ -333,13 +345,23 @@ def verified(user_id):
         return False
     return True
 
+@app.errorhandler(404)
+def not_found(error):
+    '''404 Error function'''
+    return (jsonify({'error':str(error)}), 404)
 
+@app.errorhandler(400)
+def bad_request(error):
+    '''400 Error function'''
+    return (jsonify({'error':str(error)}), 400)
 
+@app.errorhandler(405)
+def method_not_allowed(error):
+    '''405 Error function'''
+    return (jsonify({'error':str(error)}), 405)
 
+@app.errorhandler(500)
+def server_error(error):
+    '''405 Error function'''
+    return (jsonify({'error':str(error)}), 500)
 
-#    if isAdmin(identity) == True:
-        
-#    else:
-#        return jsonify({
-#                 "errors": "You have no permissions to edit this record. Contact the administrator", 
-#                 "status": 400}), 400

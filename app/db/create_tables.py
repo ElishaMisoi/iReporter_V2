@@ -19,7 +19,7 @@ QUERIES = [
   """
   CREATE TABLE IF NOT EXISTS incidents(
           id SERIAL PRIMARY KEY NOT NULL,
-          createdOn TIMESTAMP,
+          createdOn TIMESTAMP WITHOUT TIME ZONE DEFAULT (NOW() AT TIME ZONE 'utc'),
           createdBy INT REFERENCES users(id),
           type VARCHAR NOT NULL,
           location VARCHAR NOT NULL,

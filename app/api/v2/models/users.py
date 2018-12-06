@@ -44,7 +44,7 @@ class User:
                 "token": token.decode("utf-8"),
                 "user": user_info
             })
-            response.status_code = 200
+            response.status_code = 201
             return response
 
     
