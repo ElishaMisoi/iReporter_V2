@@ -6,7 +6,15 @@ from app.db import create_tables
 
 class BaseTest(unittest.TestCase):
     def setUp(self):
+        create_tables.create_tables()
         self.client = app.test_client()
+        self.incident = {
+                "location" : "Nairobi",   
+                "status" : "draft",     
+                "comment" : "another one",
+                "Images" : "image1, image2",
+                "Videos" : "video1, video2"
+                }
     ''' Generate auth token '''
     
     def auth_token(self):
