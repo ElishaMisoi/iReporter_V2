@@ -46,32 +46,31 @@ Project API demo is hosted at [Heroku](https://ireporter-v2.herokuapp.com/)
 
 
 ### Running the app locally
- 
-**Clone the repo**
-`git clone https://github.com/Elisha-Misoi/iReporter_V2.git`
+ - Clone the repo
+ - `git clone https://github.com/Elisha-Misoi/iReporter_V2.git`
 
-**Create a virtual environment**
-`virtualenv venv`
+ - Create a virtual environment
+ - `virtualenv venv`
 
-**Activate the virtual environment**
-`source venv/bin/activate`
+ - Activate the virtual environment
+ - `source venv/bin/activate`
 
-**Install dependencies**
-Navigate to the root of the application and run the command:
-`pip install requirements.txt`
+ - Install dependencies
+ - Navigate to the root of the application and run the command:
+ - `pip install requirements.txt`
 
-**Activate database path**
-`source .env`
+ - Activate database path
+ - `source .env`
 
-**Run the app**
-`python run.py`
+ - Run the app
+ - `python run.py`
 
 
 
 ### Running Tests
 
-**Install nosetests**
+ - Install nosetests
   `pip install nosetests`
   
-**Navigate to project root**
-- Use `nosetests app/tests/` to run the tests
+ - Navigate to project root
+ - Use `nosetests app/tests/` to run the tests
