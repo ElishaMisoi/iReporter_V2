@@ -1,7 +1,7 @@
 from app.db.config import open_connection, open_testDb_connection, close_connection
 
 QUERIES = [
-  """
+    """
   CREATE TABLE IF NOT EXISTS users(
           id SERIAL PRIMARY KEY NOT NULL,
           firstname VARCHAR NOT NULL,
@@ -16,7 +16,7 @@ QUERIES = [
           )
   """,
 
-  """
+    """
   CREATE TABLE IF NOT EXISTS incidents(
           id SERIAL PRIMARY KEY NOT NULL,
           createdOn TIMESTAMP WITHOUT TIME ZONE DEFAULT (NOW() AT TIME ZONE 'utc'),
@@ -38,7 +38,7 @@ queries = [
 
 
 def create_tables():
-    #create tables for base db
+    # create tables for base db
     conn = open_connection()
     cur = conn.cursor()
 
@@ -49,7 +49,7 @@ def create_tables():
 
 
 def create_test_tables():
-    #create tables for test db
+    # create tables for test db
     conn = open_testDb_connection()
     cur = conn.cursor()
 
@@ -60,7 +60,7 @@ def create_test_tables():
 
 
 def drop_tables():
-    #dropping base db tables
+    # dropping base db tables
     conn = open_connection()
     cur = conn.cursor()
 
@@ -72,7 +72,7 @@ def drop_tables():
 
 
 def drop_test_tables():
-    #dropping test db tables
+    # dropping test db tables
     conn = open_testDb_connection()
     cur = conn.cursor()
 

@@ -7,8 +7,9 @@ from app.api.v2.common.authenticator import authenticate
 from app.api.v2.common.validator import email, required
 from app.api.v2.views import api
 
+
 class SignUpSchema(Schema):
-    #Represents the schema for users
+    # Represents the schema for users
     firstname = fields.Str(required=True, validate=(required))
     lastname = fields.Str(required=True, validate=(required))
     username = fields.Str(required=True, validate=(required))
@@ -17,18 +18,21 @@ class SignUpSchema(Schema):
     password = fields.Str(required=True, validate=(required))
     phoneNumber = fields.Str(required=True, validate=(required))
 
+
 class SignInSchema(Schema):
-    #Represents the schema for users
+    # Represents the schema for users
     email = fields.Email(required=True, validate=(email))
     password = fields.Str(required=True, validate=(required))
 
+
 def email_exists(email):
-        """ Check if a user exists in the db """
-        conn = open_connection()
-        cur = conn.cursor()
-        cur.execute("SELECT * from users WHERE email='{}'".format(email))
-        user = cur.fetchone()
-        return user
+    """ Check if a user exists in the db """
+    conn = open_connection()
+    cur = conn.cursor()
+    cur.execute("SELECT * from users WHERE email='{}'".format(email))
+    user = cur.fetchone()
+    return user
+
 
 @api.route('/auth/signup', methods=['POST'])
 def create_user():
@@ -39,28 +43,34 @@ def create_user():
     data, errors = SignUpSchema().load(request.get_json())
 
     if errors:
-            return jsonify({
-              "errors": errors, 
-              "status": 400}), 400
-    
-    cur.execute("select * from users where username = '{}'".format(data['username']))
+        return jsonify({
+            "errors": errors,
+            "status": 400}), 400
+
+    cur.execute(
+        "select * from users where username = '{}'".format(data['username']))
     user_names = cur.fetchall()
-    
+
     if len(user_names) > 0:
         response = jsonify({"message": "The username taken"})
         response.status_code = 409
         return response
-    
+
     if email_exists(data['email']):
-        response = jsonify({"message": "The email is already registered, try login in"})
+        response = jsonify(
+            {"message": "The email is already registered, try login in"})
         response.status_code = 409
         return response
 
-    user = User(data['email'],data['password'])
+    user = User(data['email'], data['password'])
 
-    register = user.signup(data['username'], data['firstname'], data['lastname'],
-                data['othernames'],data['phoneNumber'],
-                )
+    register = user.signup(
+        data['username'],
+        data['firstname'],
+        data['lastname'],
+        data['othernames'],
+        data['phoneNumber'],
+    )
     close_connection(conn)
 
     return register
@@ -68,16 +78,16 @@ def create_user():
 
 @api.route('/auth/login', methods=['POST'])
 def login_user():
-    #login in user
+    # login in user
     data, errors = SignInSchema().load(request.get_json())
-    
+
     if errors:
-            return jsonify({
-              "errors": errors, 
-              "status": 400}), 400
-    
+        return jsonify({
+            "errors": errors,
+            "status": 400}), 400
+
     user = User(data['email'], data['password'])
-    
+
     login = user.login()
     return login
 
@@ -93,7 +103,7 @@ def get_users(identity):
     close_connection(conn)
     return jsonify({
         "data": users
-        }), 200
+    }), 200
 
 
 @api.route('/users/<int:user_id>', methods=['GET'])
@@ -107,7 +117,7 @@ def get_one_user(identity, user_id):
     close_connection(conn)
     return jsonify({
         "data": user_data
-        }), 200
+    }), 200
 
 
 @api.route('/users/<int:user_id>', methods=['DELETE'])
@@ -123,7 +133,7 @@ def delete_user(identity, user_id):
     if len(users < 0):
         close_connection(conn)
         return jsonify({
-        "message": "User does not exist"
+            "message": "User does not exist"
         }), 200
 
     cur.execute("delete * from users where id = {}".format(user_id))
@@ -131,4 +141,4 @@ def delete_user(identity, user_id):
     close_connection(conn)
     return jsonify({
         "message": "User successfully deleted"
-        }), 200
+    }), 200

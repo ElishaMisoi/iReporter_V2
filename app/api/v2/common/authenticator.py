@@ -16,9 +16,8 @@ def authenticate(func):
             })
             response.status_code = 401
             return response
-        
+
         jwt_token = request.headers['Authorization']
-  
 
         try:
             identity = jwt.decode(jwt_token, 'secret')['sub']

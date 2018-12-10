@@ -1,9 +1,10 @@
 import re
 from marshmallow import ValidationError
 
+
 def required(value):
     """Validate that field under validation does not contain null value."""
-    
+
     if isinstance(value, str):
         if not value.strip(' '):
             raise ValidationError('The parameter cannot be null')
@@ -11,6 +12,7 @@ def required(value):
         return value
     elif value:
         return value
+
 
 def email(value):
     """Validate field matches email format."""
@@ -20,6 +22,7 @@ def email(value):
 
     return value
 
+
 def verifyStatus(value):
     """Validate status matches the required statuses"""
 
@@ -27,9 +30,9 @@ def verifyStatus(value):
         if not value.strip(' '):
             raise ValidationError('Status cannot be null')
 
-    statuses = ['accepted','rejected','under investigation', 'draft']
+    statuses = ['accepted', 'rejected', 'under investigation', 'draft']
 
     if value not in statuses:
-        raise ValidationError('The status can only be accepted, rejected, under investigation or draft')
+        raise ValidationError('Invalid status')
 
     return value
