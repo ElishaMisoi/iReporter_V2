@@ -26,27 +26,20 @@ Project API demo is hosted at [Heroku](https://ireporter-v2.herokuapp.com/)
 |---|---|---|
 |  **POST** |  `/auth/signup` | sign up a user |
 |  **POST** |  `/auth/login` | login a user |
-
 |  **POST** |  `/redflags` | post a red-flag |
 |  **POST** |  `/interventions` | post an intervention |
-
 |  **GET** |  `/redflags` | get list of all red-flags |
 |  **GET** |  `/interventions` | get list of all interventions |
-
 |  **GET** |  `/redflags/<int:redflag_id>` | get a red-flag record by `redflag_id` field |
 |  **GET** |  `/interventions/<int:intervention_id>` | get an intervention record by `intervention_id` field |
-
 |  **PATCH** |  `/redflags/<int:redflag_id>/location` | edit redflag location `redflag_id` field |
 |  **PATCH** |  `/redflags/<int:redflag_id>/comment` | edit redflag redflag comment by `redflag_id` field |
 |  **PATCH** |  `/redflags/<int:redflag_id>/status` | edit redflag record status by `redflag_id` field |
-
 |  **PATCH** |  `/interventions/<int:intervention_id>/location` | edit intervention location `intervention_id` field |
 |  **PATCH** |  `/redflags/<int:intervention_id>/comment` | edit redflag intervention comment by `intervention_id` field |
 |  **PATCH** |  `/redflags/<int:intervention_id>/status` | edit redflag intervention status by `intervention_id` field |
-
 | **DELETE**  |  `/redflags/<int:redflag_id>` | delete redflag record by `redflag_id` |
 | **DELETE**  |  `/interventions/<int:intervention_id>` | delete intervention record by `intervention_id` |
-
 |  **GET** |  `/users` | fetch all users |
 |  **GET** |  `/users/<int:user_id>` | fetch one user by `user_id` |
 |  **DELETE** |  `/users/<int:user_id>` | delete one user by `user_id` |
