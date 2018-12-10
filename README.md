@@ -22,7 +22,7 @@ Project API demo is hosted at [Heroku](https://ireporter-v2.herokuapp.com/)
 
 ### API endpoints
 
-Prefix `api/v2/` to all api endpoints below
+Prefix `/api/v2` to all api endpoints below
 
 | **HTTP METHOD**   | **URI**  | **ACTION** |
 |---|---|---|
