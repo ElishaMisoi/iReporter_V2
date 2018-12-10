@@ -256,7 +256,6 @@ def edit_incident(update_type, incident_id, update_record, type, indentity):
     if verified(indentity) == True:
         query = "update incidents set " + update_type + " = '{}' where id = '{}'".format(update_record, incident_id)
         cur.execute(query)
-        cur.close()
         return jsonify({
         "status" : 200,
         "message": "Updated " + incident[3] + " record's " + update_type
@@ -326,7 +325,6 @@ def delete_incident(incident_id, type):
         }), 200
 
     cur.execute("delete from incidents where id = '{}'".format(incident_id))
-    cur.close()
     conn.commit()
     return jsonify({
         "message": type + " record was deleted"
@@ -339,12 +337,14 @@ def isAdmin(user_id):
     print(user)
     return user[9]
 
+
 def verified(user_id):
     cur.execute("select * from incidents where createdBy = '{}'".format(user_id))
     incident = cur.fetchone()
     if not incident and isAdmin(user_id) == False:
         return False
     return True
+
 
 @app.errorhandler(404)
 def not_found(error):

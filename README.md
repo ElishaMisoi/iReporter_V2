@@ -16,7 +16,7 @@ Corruption is a huge bane to Africa’s development. African countries must deve
 7. Users can change the geolocation (Lat Long Coordinates) attached to their ​ red-flag ​ or intervention ​ records​ .
 8. Admin can change the ​ status​​ of a record to either ​ under investigation, rejected ​ (in the event of a false claim)​ ​ or​ resolved ( ​ in the event that the claim has been investigated and resolved)​
 
-## Demo
+### Demo
 
 Project API demo is hosted at [Heroku](https://ireporter-v2.herokuapp.com/)
 
@@ -24,22 +24,61 @@ Project API demo is hosted at [Heroku](https://ireporter-v2.herokuapp.com/)
 
 | **HTTP METHOD**   | **URI**  | **ACTION** |
 |---|---|---|
-|  **POST** |  `/red-flags` | post a red-flag |
-|  **GET** |  `/red-flags` | get list of all red-flags |
-|  **GET** |  `/red-flags/<int:redflag_id>` | fetch red-flag records by `redflag_id` field |
-|  **PATCH** |  `/red-flags/<int:redflag_id>/location` | edit redflag location `incident_id` field |
-|  **PATCH** |  `/red-flags/<int:redflag_id>/comment` | edit redflag comment `incident_id` field |
-| **DELETE**  |  `/red-flags/<int:redflag_id>` | delete redflag record with given `redflag_id` |
-|  **POST** |  `/api/v1/incident` | post an incident |
-|  **GET** |  `/api/v1/incidents` | get list of all incidents |
-|  **GET** |  `/api/v1/incidents/<int:incident_id>` | fetch incident records by `incident_id` field |
-| **DELETE, GET, PUT**  |  `/api/v1/incidents/<int:incident_id>` | get, delete and update incident records with given `incident_id` |
-|  **POST** |  `/api/v1/users` | create a new user |
-|  **DELETE, GET, PUT** |  `/api/v1/users/<int:user_id>'  | get, delete and update user with given `user_id`|
-|  **GET** |  `/api/v1/users' | fetch all users |
+|  **POST** |  `/auth/signup` | sign up a user |
+|  **POST** |  `/auth/login` | login a user |
+
+|  **POST** |  `/redflags` | post a red-flag |
+|  **POST** |  `/interventions` | post an intervention |
+
+|  **GET** |  `/redflags` | get list of all red-flags |
+|  **GET** |  `/interventions` | get list of all interventions |
+
+|  **GET** |  `/redflags/<int:redflag_id>` | get a red-flag record by `redflag_id` field |
+|  **GET** |  `/interventions/<int:intervention_id>` | get an intervention record by `intervention_id` field |
+
+|  **PATCH** |  `/redflags/<int:redflag_id>/location` | edit redflag location `redflag_id` field |
+|  **PATCH** |  `/redflags/<int:redflag_id>/comment` | edit redflag redflag comment by `redflag_id` field |
+|  **PATCH** |  `/redflags/<int:redflag_id>/status` | edit redflag record status by `redflag_id` field |
+
+|  **PATCH** |  `/interventions/<int:intervention_id>/location` | edit intervention location `intervention_id` field |
+|  **PATCH** |  `/redflags/<int:intervention_id>/comment` | edit redflag intervention comment by `intervention_id` field |
+|  **PATCH** |  `/redflags/<int:intervention_id>/status` | edit redflag intervention status by `intervention_id` field |
+
+| **DELETE**  |  `/redflags/<int:redflag_id>` | delete redflag record by `redflag_id` |
+| **DELETE**  |  `/interventions/<int:intervention_id>` | delete intervention record by `intervention_id` |
+
+|  **GET** |  `/users` | fetch all users |
+|  **GET** |  `/users/<int:user_id>` | fetch one user by `user_id` |
+|  **DELETE** |  `/users/<int:user_id>` | delete one user by `user_id` |
+
+
+### Running the app locally
+ 
+**Clone the repo**
+`git clone https://github.com/Elisha-Misoi/iReporter_V2.git`
+
+**Create a virtual environment**
+`virtualenv venv`
+
+**Activate the virtual environment**
+`source venv/bin/activate`
+
+**Install dependencies**
+Navigate to the root of the application and run the command:
+`pip install requirements.txt`
+
+**Activate database path**
+`source .env`
+
+**Run the app**
+`python run.py`
+
 
 
 ### Running Tests
-- Install nosetests
-- Navigate to project root
+
+**Install nosetests**
+  `pip install nosetests`
+  
+**Navigate to project root**
 - Use `nosetests app/tests/` to run the tests

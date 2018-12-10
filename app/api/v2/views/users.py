@@ -28,7 +28,6 @@ def email_exists(email):
         cur = conn.cursor()
         cur.execute("SELECT * from users WHERE email='{}'".format(email))
         user = cur.fetchone()
-        cur.close()
         return user
 
 @api.route('/auth/signup', methods=['POST'])
@@ -62,7 +61,6 @@ def create_user():
     register = user.signup(data['username'], data['firstname'], data['lastname'],
                 data['othernames'],data['phoneNumber'],
                 )
-    cur.close()
     close_connection(conn)
 
     return register
@@ -92,7 +90,6 @@ def get_users(identity):
     cur = conn.cursor()
     cur.execute("select * from users")
     users = cur.fetchall()
-    cur.close()
     close_connection(conn)
     return jsonify({
         "data": users
@@ -107,7 +104,6 @@ def get_one_user(identity, user_id):
     cur = conn.cursor()
     cur.execute("select * from users where id = {}".format(user_id))
     user_data = cur.fetchone()
-    cur.close()
     close_connection(conn)
     return jsonify({
         "data": user_data
@@ -125,14 +121,12 @@ def delete_user(identity, user_id):
     users = cur.fetchall()
 
     if len(users < 0):
-        cur.close()
         close_connection(conn)
         return jsonify({
         "message": "User does not exist"
         }), 200
 
     cur.execute("delete * from users where id = {}".format(user_id))
-    cur.close()
     conn.commit()
     close_connection(conn)
     return jsonify({
