@@ -53,7 +53,7 @@ class User:
             response = jsonify({
                 "message": "User registered successfully",
                 "token": token.decode("utf-8"),
-                "user": user_info
+                "user": [user_info]
             })
             response.status_code = 201
             return response
@@ -120,7 +120,7 @@ class User:
                 response = jsonify({
                     "message": "Login successful",
                     "token": token.decode("utf-8"),
-                    "user": user_info
+                    "user": [user_info]
                 })
                 response.status_code = 200
                 return response

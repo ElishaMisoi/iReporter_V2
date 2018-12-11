@@ -1,6 +1,7 @@
 from functools import wraps
 from flask import jsonify, request
 import jwt
+
 from app.db.config import open_connection, close_connection
 
 

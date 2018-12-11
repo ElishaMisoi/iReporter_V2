@@ -97,7 +97,7 @@ def get_incidents(type, identity):
 
     return jsonify({
         "status": 200,
-        "data": incidents
+        "data": [incidents]
     }), 200
 
 
@@ -332,7 +332,7 @@ def get_single_incident(incident_id, type):
 
     return jsonify({
         "status": 200,
-        "data": incident
+        "data": [incident]
     }), 200
 
 
@@ -384,7 +384,6 @@ def verified(user_id):
     if not incident and isAdmin(user_id) == False:
         return False
     return True
-
 
 @app.errorhandler(404)
 def not_found(error):

@@ -42,6 +42,8 @@ def create_tables():
     conn = open_connection()
     cur = conn.cursor()
 
+    print("created tables", conn)
+    
     for query in QUERIES:
         cur.execute(query)
 

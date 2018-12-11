@@ -61,6 +61,10 @@ Prefix `/api/v2` to all api endpoints below
  - Navigate to the root of the application and run the command:
  - `pip install requirements.txt`
 
+ - Create a database 
+ - `sudo -u postgres psql`
+ - `CREATE DATABASE ireporter;`
+ 
  - Activate database path
  - `source .env`
 
