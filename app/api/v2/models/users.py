@@ -6,16 +6,17 @@ from passlib.apps import custom_app_context as pwd_hash
 from app.db.config import open_connection
 
 conn = open_connection()
-cur =conn.cursor()
+cur = conn.cursor()
+
 
 class User:
     # user class
-    def __init__(self,email, password):
+    def __init__(self, email, password):
         self.email = email
         self.password = password
-    
-    def signup(self, username, firstname, lastname, othernames,  phoneNumber):
-        #registering a new user
+
+    def signup(self, username, firstname, lastname, othernames, phoneNumber):
+        # registering a new user
         user_exists = self.user_exists()
 
         if user_exists:
@@ -30,9 +31,19 @@ class User:
             conn = open_connection()
             cur = conn.cursor()
 
-            cur.execute("INSERT INTO users(firstname, lastname, othernames, email, phoneNumber, username, password) values('{}','{}','{}','{}','{}','{}','{}')".format(firstname,lastname,othernames,self.email,phoneNumber,username,hashed_pw))
+            cur.execute(
+                "INSERT INTO users(firstname, lastname, othernames, email, phoneNumber, username, password) values('{}','{}','{}','{}','{}','{}','{}')".format(
+                    firstname,
+                    lastname,
+                    othernames,
+                    self.email,
+                    phoneNumber,
+                    username,
+                    hashed_pw))
 
-            cur.execute("select id from users where email = '{}' ".format(self.email))
+            cur.execute(
+                "select id from users where email = '{}' ".format(
+                    self.email))
             user_id = cur.fetchone()[0]
             token = self.generate_token(user_id)
             cur.close()
@@ -47,14 +58,12 @@ class User:
             response.status_code = 201
             return response
 
-    
     def user_exists(self):
-        #checking if user already exists
+        # checking if user already exists
         cur.execute("select * from users where email='{}'".format(self.email))
         user = cur.fetchone()
         return user
 
-    
     def get_user_details(self):
         # getting one user
         user = self.user_exists()
@@ -70,7 +79,7 @@ class User:
             user_data['username'] = user[6]
             user_data['registered'] = user[8]
             user_data['isAdmin'] = user[9]
-            
+
             return user_data
 
         else:
@@ -95,9 +104,8 @@ class User:
         except Exception as e:
             return e
 
-
     def login(self):
-        #logging in an existing user
+        # logging in an existing user
         user_exists = self.user_exists()
 
         if user_exists:
@@ -131,8 +139,6 @@ class User:
             response.status_code = 401
         return response
 
-
     def verify_password(self, stored_pwd):
-        #confirm password 
+        # confirm password
         return pwd_hash.verify(self.password, stored_pwd)
-

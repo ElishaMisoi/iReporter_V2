@@ -3,14 +3,15 @@ from flask import jsonify
 from app.db.config import open_connection, close_connection
 
 conn = open_connection()
-cur =conn.cursor()
+cur = conn.cursor()
+
 
 class Incident:
     # incident class
     def __init__(self, createdBy, type, location,
                  status, Images, Videos, comment):
-        self.createdBy = createdBy 
-        self.type = type 
+        self.createdBy = createdBy
+        self.type = type
         self.location = location
         self.status = status
         self.Images = Images
@@ -18,14 +19,22 @@ class Incident:
         self.comment = comment
 
     def create_incident(self):
-        #creating an incident
+        # creating an incident
         conn = open_connection()
-        cur = conn.cursor()        
-        cur.execute("INSERT INTO incidents(createdBy, type, location, status, Images, Videos, comment) values('{}','{}','{}','{}','{}','{}','{}')".format(self.createdBy,self.type,self.location,self.status,self.Images,self.Videos,self.comment))
+        cur = conn.cursor()
+        cur.execute(
+            "INSERT INTO incidents(createdBy, type, location, status, Images, Videos, comment) values('{}','{}','{}','{}','{}','{}','{}')".format(
+                self.createdBy,
+                self.type,
+                self.location,
+                self.status,
+                self.Images,
+                self.Videos,
+                self.comment))
         conn.commit()
         cur.execute("select * from incidents")
         incident = cur.fetchall()[-1]
-        
+
         cur.close()
 
         print(incident)
@@ -35,7 +44,7 @@ class Incident:
             incident_type = 'red-flag'
         else:
             incident_type = 'intervention'
-            
+
         response = jsonify({
             "status": 201,
             "data": incident,
@@ -43,4 +52,3 @@ class Incident:
         }), 201
 
         return response
-    

@@ -12,8 +12,9 @@ from app.db.config import open_connection, close_connection
 conn = open_connection()
 cur = conn.cursor()
 
+
 class IncidentSchema(Schema):
-    #Represents the schema for incidents
+    # Represents the schema for incidents
     type = fields.Str(required=False)
     comment = fields.Str(required=True, validate=(required))
     location = fields.Str(required=True, validate=(required))
@@ -28,35 +29,37 @@ class IncidentSchema(Schema):
 @api.route('/redflags', methods=['POST'])
 @authenticate
 def create_redflag(identity):
-    #creating a red-flag
+    # creating a red-flag
     data, errors = IncidentSchema().load(request.get_json())
-    
+
     if errors:
-            return jsonify({
-              "errors": errors, 
-              "status": 400}), 400
+        return jsonify({
+            "errors": errors,
+            "status": 400}), 400
 
     return create_incident(identity, data, 'red-flag')
+
 
 @api.route('/interventions', methods=['POST'])
 @authenticate
 def create_intervension(identity):
-    #creating a red-flag
+    # creating a red-flag
     data, errors = IncidentSchema().load(request.get_json())
-    
+
     if errors:
-            return jsonify({
-              "errors": errors, 
-              "status": 400}), 400
+        return jsonify({
+            "errors": errors,
+            "status": 400}), 400
 
     return create_incident(identity, data, 'intervention')
+
 
 def create_incident(identity, data, type):
     # creating an incident
     createdBy = identity
     incident = Incident(createdBy, type, data['location'],
-                data['status'],
-                data['Images'], data['Videos'], data['comment'])
+                        data['status'],
+                        data['Images'], data['Videos'], data['comment'])
     response = incident.create_incident()
     return response
 
@@ -78,257 +81,293 @@ def get_redflags(identity):
 def get_incidents(type, identity):
     incidents = ()
 
-    if isAdmin(identity) == True:
+    if isAdmin(identity):
         cur.execute("select * from incidents where type = '{}'".format(type))
         incidents = cur.fetchall()
     else:
-        cur.execute("select * from incidents where type = '{}' and createdBy = '{}'".format(type, identity))
+        cur.execute(
+            "select * from incidents where type = '{}' and createdBy = '{}'".format(type, identity))
         incidents = cur.fetchall()
-        
+
     if not incidents:
         return jsonify({
-        "status" : 200,
-        "message": "There are no " + type + "s"
+            "status": 200,
+            "message": "There are no " + type + "s"
         }), 200
 
     return jsonify({
-        "status" : 200,
+        "status": 200,
         "data": incidents
-        }), 200
+    }), 200
 
 
 @api.route('/redflags/<int:redflag_id>/status', methods=['PATCH'])
 @authenticate
 def edit_redflag_status(identity, redflag_id):
-    #editing status of a red-flag record
+    # editing status of a red-flag record
 
-    if isAdmin(identity) == True:
+    if isAdmin(identity):
         data, errors = IncidentSchema().load(request.get_json())
-        
+
         if errors:
-                return jsonify({
-                "errors": errors, 
+            return jsonify({
+                "errors": errors,
                 "status": 400}), 400
-        
+
         if data['type'] == 'intervention':
             return jsonify({
-                "errors": "You are trying to edit an intervention record, use /interventions/<int:intervention_id>/status endpoint instead", 
+                "errors": "You are trying to edit an intervention record, use /interventions/<int:intervention_id>/status endpoint instead",
                 "status": 400}), 400
 
         if not data['status'].strip(' '):
             return jsonify({
-                "errors": "Red-flag status cannot be null", 
+                "errors": "Red-flag status cannot be null",
                 "status": 400}), 400
 
-        return edit_incident('status', redflag_id, data['status'], 'red-flag', identity)
+        return edit_incident(
+            'status',
+            redflag_id,
+            data['status'],
+            'red-flag',
+            identity)
     else:
-         return jsonify({
-                "errors": "You have no permissions to edit this record. Contact the administrator", 
-                "status": 400}), 400
+        return jsonify({
+            "errors": "You have no permissions to edit this record. Contact the administrator",
+            "status": 400}), 400
 
 
 @api.route('/interventions/<int:intervention_id>/status', methods=['PATCH'])
 @authenticate
 def edit_intervention_status(identity, intervention_id):
-    #editing status of an intervention record
-   if isAdmin(identity) == True:
+    # editing status of an intervention record
+    if isAdmin(identity):
         data, errors = IncidentSchema().load(request.get_json())
         if errors:
-                return jsonify({
-                "errors": errors, 
+            return jsonify({
+                "errors": errors,
                 "status": 400}), 400
-        
+
         if data['type'] == 'red-flag':
             return jsonify({
-                "errors": "You are trying to edit a red-flag record, use /red-flags/<int:redflag_id>/status endpoint instead", 
+                "errors": "You are trying to edit a red-flag record, use /red-flags/<int:redflag_id>/status endpoint instead",
                 "status": 400}), 400
 
         if not data['status'].strip(' '):
             return jsonify({
-                "errors": "Red-flag status cannot be null", 
+                "errors": "Red-flag status cannot be null",
                 "status": 400}), 400
 
-        return edit_incident('status', intervention_id, data['status'], 'intervention', identity)
+        return edit_incident(
+            'status',
+            intervention_id,
+            data['status'],
+            'intervention',
+            identity)
 
-   else:
-       return jsonify({
-                "errors": "You have no permissions to edit this record. Contact the administrator", 
-                "status": 400}), 400
+    else:
+        return jsonify({
+            "errors": "You have no permissions to edit this record. Contact the administrator",
+            "status": 400}), 400
 
 
 @api.route('/redflags/<int:redflag_id>/location', methods=['PATCH'])
 @authenticate
 def edit_redflag_location(identity, redflag_id):
-    #editing location of a red-flag record
+    # editing location of a red-flag record
     data, errors = IncidentSchema().load(request.get_json())
-    
+
     if errors:
-            return jsonify({
-              "errors": errors, 
-              "status": 400}), 400
+        return jsonify({
+            "errors": errors,
+            "status": 400}), 400
 
     if not data['type'].strip(' '):
-            return jsonify({
-              "errors": "type cannot be null", 
-              "status": 400}), 400
-    
+        return jsonify({
+            "errors": "type cannot be null",
+            "status": 400}), 400
+
     if data['type'] == 'intervention':
         return jsonify({
-              "errors": "You are trying to edit an intervention record, use /interventions/<int:intervention_id>/location endpoint instead", 
-              "status": 400}), 400
+            "errors": "You are trying to edit an intervention record, use /interventions/<int:intervention_id>/location endpoint instead",
+            "status": 400}), 400
 
-    return edit_incident('location', redflag_id, data['location'], 'red-flag', identity)
+    return edit_incident(
+        'location',
+        redflag_id,
+        data['location'],
+        'red-flag',
+        identity)
 
 
 @api.route('/interventions/<int:intervention_id>/location', methods=['PATCH'])
 @authenticate
 def edit_intervention_location(identity, intervention_id):
-    #editing status of an intervention record
+    # editing status of an intervention record
     data, errors = IncidentSchema().load(request.get_json())
-    
+
     if errors:
-            return jsonify({
-              "errors": errors, 
-              "status": 400}), 400
-    
+        return jsonify({
+            "errors": errors,
+            "status": 400}), 400
+
     if not data['type'].strip(' '):
-            return jsonify({
-              "errors": "type cannot be null", 
-              "status": 400}), 400
+        return jsonify({
+            "errors": "type cannot be null",
+            "status": 400}), 400
 
     if data['type'] == 'red-flag':
         return jsonify({
-              "errors": "You are trying to edit a red-flag record, use /red-flags/<int:redflag_id>/location endpoint instead", 
-              "status": 400}), 400
+            "errors": "You are trying to edit a red-flag record, use /red-flags/<int:redflag_id>/location endpoint instead",
+            "status": 400}), 400
 
-    return edit_incident('location', intervention_id, data['location'], 'intervention', identity)
+    return edit_incident(
+        'location',
+        intervention_id,
+        data['location'],
+        'intervention',
+        identity)
 
 
 @api.route('/interventions/<int:intervention_id>/comment', methods=['PATCH'])
 @authenticate
 def edit_intervention_comment(identity, intervention_id):
-    #editing status of an intervention record
+    # editing status of an intervention record
     data, errors = IncidentSchema().load(request.get_json())
-    
+
     if errors:
-            return jsonify({
-              "errors": errors, 
-              "status": 400}), 400
-    
+        return jsonify({
+            "errors": errors,
+            "status": 400}), 400
+
     if data['type'] == 'red-flag':
         return jsonify({
-              "errors": "You are trying to edit a red-flag record, use /red-flags/<int:redflag_id>/comment endpoint instead", 
-              "status": 400}), 400
+            "errors": "You are trying to edit a red-flag record, use /red-flags/<int:redflag_id>/comment endpoint instead",
+            "status": 400}), 400
 
-    return edit_incident('comment', intervention_id, data['comment'], 'intervention', identity)
+    return edit_incident(
+        'comment',
+        intervention_id,
+        data['comment'],
+        'intervention',
+        identity)
 
 
 @api.route('/redflags/<int:redflag_id>/comment', methods=['PATCH'])
 @authenticate
 def edit_redflag_comment(identity, redflag_id):
-    #editing status of a red-flag record
+    # editing status of a red-flag record
     data, errors = IncidentSchema().load(request.get_json())
-    
+
     if errors:
-            return jsonify({
-              "errors": errors, 
-              "status": 400}), 400
-    
+        return jsonify({
+            "errors": errors,
+            "status": 400}), 400
+
     if data['type'] == 'intervention':
         return jsonify({
-              "errors": "You are trying to edit an intervention record, use /interventions/<int:intervention_id>/comment endpoint instead", 
-              "status": 400}), 400
+            "errors": "You are trying to edit an intervention record, use /interventions/<int:intervention_id>/comment endpoint instead",
+            "status": 400}), 400
 
-    return edit_incident('comment', redflag_id, data['comment'], 'red-flag', identity)
+    return edit_incident(
+        'comment',
+        redflag_id,
+        data['comment'],
+        'red-flag',
+        identity)
 
 
 def edit_incident(update_type, incident_id, update_record, type, indentity):
-    #function for editing incidents
-    cur.execute("select * from incidents where id = '{}' and type = '{}'".format(incident_id, type))
+    # function for editing incidents
+    cur.execute(
+        "select * from incidents where id = '{}' and type = '{}'".format(incident_id, type))
     incident = cur.fetchone()
 
     if not incident:
         return jsonify({
-        "status" : 404,
-        "message": "The " + type + " record was not found"
+            "status": 404,
+            "message": "The " + type + " record was not found"
         }), 404
 
-    if verified(indentity) == True:
-        query = "update incidents set " + update_type + " = '{}' where id = '{}'".format(update_record, incident_id)
+    if verified(indentity):
+        query = "update incidents set " + update_type + \
+            " = '{}' where id = '{}'".format(update_record, incident_id)
         cur.execute(query)
         return jsonify({
-        "status" : 200,
-        "message": "Updated " + incident[3] + " record's " + update_type
+            "status": 200,
+            "message": "Updated " + incident[3] + " record's " + update_type
         }), 200
     else:
         return jsonify({
-        "status" : 401,
-        "message": "You have no permissions to edit this record"
+            "status": 401,
+            "message": "You have no permissions to edit this record"
         }), 401
 
 
 @api.route('/redflags/<int:redflag_id>', methods=['GET'])
 @authenticate
 def get_single_redflag(identity, redflag_id):
-    #getting a single redflag
-    if verified(identity) == True:
-     return get_single_incident(redflag_id, 'red-flag')
+    # getting a single redflag
+    if verified(identity):
+        return get_single_incident(redflag_id, 'red-flag')
 
 
 @api.route('/interventions/<int:intervention_id>', methods=['GET'])
 @authenticate
 def get_single_intervention(identity, intervention_id):
-    #getting a intervention redflag
-    if verified(identity) == True:
-     return get_single_incident(intervention_id, 'intervention')
+    # getting a intervention redflag
+    if verified(identity):
+        return get_single_incident(intervention_id, 'intervention')
 
 
 def get_single_incident(incident_id, type):
-    cur.execute("select * from incidents where id = '{}' and type = '{}'".format(incident_id, type))
+    cur.execute(
+        "select * from incidents where id = '{}' and type = '{}'".format(incident_id, type))
     incident = cur.fetchone()
 
     if not incident:
         return jsonify({
-        "status" : 404,
-        "message": "The " + type + " record was not found"
+            "status": 404,
+            "message": "The " + type + " record was not found"
         }), 404
 
     return jsonify({
-    "status" : 200,
-    "data": incident
+        "status": 200,
+        "data": incident
     }), 200
 
 
 @api.route('/redflags/<int:redflags_id>', methods=['DELETE'])
 @authenticate
 def delete_redflag(identity, redflags_id):
-    #deleting a red-flag record 
-    if verified(identity) == True:
-     return delete_incident(redflags_id, 'red-flag')
+    # deleting a red-flag record
+    if verified(identity):
+        return delete_incident(redflags_id, 'red-flag')
 
 
 @api.route('/interventions/<int:intervention_id>', methods=['DELETE'])
 @authenticate
 def delete_intervention(identity, intervention_id):
-    #deleting an intervention record
-    if verified(identity) == True:
-     return delete_incident(intervention_id, 'intervention')
+    # deleting an intervention record
+    if verified(identity):
+        return delete_incident(intervention_id, 'intervention')
+
 
 def delete_incident(incident_id, type):
-    cur.execute("select * from incidents where id = '{}' and type = '{}'".format(incident_id, type))
+    cur.execute(
+        "select * from incidents where id = '{}' and type = '{}'".format(incident_id, type))
     incident = cur.fetchone()
 
     if not incident:
         return jsonify({
-        "status" : 200,
-        "message": "The " + type + " record was not found"
+            "status": 200,
+            "message": "The " + type + " record was not found"
         }), 200
 
     cur.execute("delete from incidents where id = '{}'".format(incident_id))
     conn.commit()
     return jsonify({
         "message": type + " record was deleted"
-        }), 200
+    }), 200
 
 
 def isAdmin(user_id):
@@ -339,7 +378,8 @@ def isAdmin(user_id):
 
 
 def verified(user_id):
-    cur.execute("select * from incidents where createdBy = '{}'".format(user_id))
+    cur.execute(
+        "select * from incidents where createdBy = '{}'".format(user_id))
     incident = cur.fetchone()
     if not incident and isAdmin(user_id) == False:
         return False
@@ -349,20 +389,22 @@ def verified(user_id):
 @app.errorhandler(404)
 def not_found(error):
     '''404 Error function'''
-    return (jsonify({'error':str(error)}), 404)
+    return (jsonify({'error': str(error)}), 404)
+
 
 @app.errorhandler(400)
 def bad_request(error):
     '''400 Error function'''
-    return (jsonify({'error':str(error)}), 400)
+    return (jsonify({'error': str(error)}), 400)
+
 
 @app.errorhandler(405)
 def method_not_allowed(error):
     '''405 Error function'''
-    return (jsonify({'error':str(error)}), 405)
+    return (jsonify({'error': str(error)}), 405)
+
 
 @app.errorhandler(500)
 def server_error(error):
     '''405 Error function'''
-    return (jsonify({'error':str(error)}), 500)
-
+    return (jsonify({'error': str(error)}), 500)
