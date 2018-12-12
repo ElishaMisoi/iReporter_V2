@@ -15,9 +15,9 @@ class Test_Incident(BaseTest):
                                     headers=dict(Authorization=token),
                                     content_type='application/json',
                                     data=json.dumps(self.incident))
-        
+
         self.assertEqual(response.status_code, 201)
-        
+
     def test_add_intervention(self):
         """ Test that API adds an intervention"""
         token = self.auth_token()
@@ -25,19 +25,19 @@ class Test_Incident(BaseTest):
                                     headers=dict(Authorization=token),
                                     content_type='application/json',
                                     data=json.dumps(self.incident))
-        
+
         self.assertEqual(response.status_code, 201)
-        
+
     def test_get_single_redflag(self):
         """ Test that API gets single redflag"""
         token = self.auth_token()
         self.client.post('api/v2/redflags',
-                            headers=dict(Authorization=token),
-                            content_type='application/json',
-                            data=json.dumps(self.incident))
+                         headers=dict(Authorization=token),
+                         content_type='application/json',
+                         data=json.dumps(self.incident))
         response = self.client.get('api/v2/redflags/16',
-                                    headers=dict(Authorization=token),
-                                    content_type='application/json')
+                                   headers=dict(Authorization=token),
+                                   content_type='application/json')
         print(response.data)
         self.assertEqual(response.status_code, 200)
 
@@ -45,12 +45,12 @@ class Test_Incident(BaseTest):
         """ Test that API gets single intervention"""
         token = self.auth_token()
         self.client.post('api/v2/interventions',
-                            headers=dict(Authorization=token),
-                            content_type='application/json',
-                            data=json.dumps(self.incident))
+                         headers=dict(Authorization=token),
+                         content_type='application/json',
+                         data=json.dumps(self.incident))
         response = self.client.get('api/v2/interventions/15',
-                                    headers=dict(Authorization=token),
-                                    content_type='application/json')
+                                   headers=dict(Authorization=token),
+                                   content_type='application/json')
         print(response.data)
         self.assertEqual(response.status_code, 200)
 
@@ -64,10 +64,8 @@ class Test_Incident(BaseTest):
         response = self.client.get('api/v2/redflags',
                                    headers=dict(Authorization=token),
                                    content_type='application/json')
-        
-        self.assertEqual(response.status_code, 200)
-        
 
+        self.assertEqual(response.status_code, 200)
 
     def test_get_all_interventions(self):
         """ Test that API adds redflag"""
@@ -81,8 +79,6 @@ class Test_Incident(BaseTest):
                                    content_type='application/json')
         print(response.data)
         self.assertEqual(response.status_code, 200)
-        
-
 
     def test_edit_redflag_location(self):
         """ Test that API can edit a redflag location """
@@ -101,16 +97,14 @@ class Test_Incident(BaseTest):
                          content_type='application/json',
                          data=json.dumps(redflag))
         self.client.patch('api/v2/redflags/1/location',
-                         headers=dict(Authorization=token),
-                         content_type='application/json',
-                         data=json.dumps(redflag))
+                          headers=dict(Authorization=token),
+                          content_type='application/json',
+                          data=json.dumps(redflag))
         response = self.client.get('api/v2/redflags',
                                    headers=dict(Authorization=token),
                                    content_type='application/json')
         print(response.data)
         self.assertEqual(response.status_code, 200)
-        
-
 
     def test_edit_intervention_location(self):
         """ Test that API can edit a intervention location """
@@ -129,17 +123,15 @@ class Test_Incident(BaseTest):
                          content_type='application/json',
                          data=json.dumps(intervention))
         self.client.patch('api/v2/interventions/1/location',
-                         headers=dict(Authorization=token),
-                         content_type='application/json',
-                         data=json.dumps(intervention))
+                          headers=dict(Authorization=token),
+                          content_type='application/json',
+                          data=json.dumps(intervention))
         response = self.client.get('api/v2/interventions',
                                    headers=dict(Authorization=token),
                                    content_type='application/json')
         print(response.data)
         self.assertEqual(response.status_code, 200)
-        
 
-    
     def test_edit_redflag_comment(self):
         """ Test that API can edit a redflag comment """
         token = self.auth_token()
@@ -157,13 +149,11 @@ class Test_Incident(BaseTest):
                          content_type='application/json',
                          data=json.dumps(redflag))
         response = self.client.patch('api/v2/redflags/10/comment',
-                         headers=dict(Authorization=token),
-                         content_type='application/json',
-                         data=json.dumps(redflag))
+                                     headers=dict(Authorization=token),
+                                     content_type='application/json',
+                                     data=json.dumps(redflag))
         print(response.data)
         self.assertEqual(response.status_code, 200)
-        
-
 
     def test_edit_intervention_comment(self):
         """ Test that API can edit a intervention comment """
@@ -182,13 +172,11 @@ class Test_Incident(BaseTest):
                          content_type='application/json',
                          data=json.dumps(intervention))
         response = self.client.patch('api/v2/interventions/7/comment',
-                         headers=dict(Authorization=token),
-                         content_type='application/json',
-                         data=json.dumps(intervention))
+                                     headers=dict(Authorization=token),
+                                     content_type='application/json',
+                                     data=json.dumps(intervention))
         print(response.data)
         self.assertEqual(response.status_code, 200)
-        
-
 
     def test_edit_redflag_status(self):
         """ Test that API can edit a redflag status """
@@ -207,13 +195,11 @@ class Test_Incident(BaseTest):
                          content_type='application/json',
                          data=json.dumps(redflag))
         response = self.client.patch('api/v2/redflags/12/status',
-                         headers=dict(Authorization=token),
-                         content_type='application/json',
-                         data=json.dumps(redflag))
+                                     headers=dict(Authorization=token),
+                                     content_type='application/json',
+                                     data=json.dumps(redflag))
         print(response.data)
         self.assertEqual(response.status_code, 200)
-        
-
 
     def test_edit_intervention_status(self):
         """ Test that API can edit a intervention status """
@@ -232,13 +218,11 @@ class Test_Incident(BaseTest):
                          content_type='application/json',
                          data=json.dumps(intervention))
         response = self.client.patch('api/v2/interventions/7/status',
-                         headers=dict(Authorization=token),
-                         content_type='application/json',
-                         data=json.dumps(intervention))
+                                     headers=dict(Authorization=token),
+                                     content_type='application/json',
+                                     data=json.dumps(intervention))
         print(response.data)
         self.assertEqual(response.status_code, 200)
-        
-
 
     def test_delete_redflag(self):
         """ Test that API can delete redflag record """
@@ -248,13 +232,11 @@ class Test_Incident(BaseTest):
                          content_type='application/json',
                          data=json.dumps(self.incident))
         response = self.client.delete('api/v2/interventions/1',
-                         headers=dict(Authorization=token),
-                         content_type='application/json',
-                         data=json.dumps(self.incident))
+                                      headers=dict(Authorization=token),
+                                      content_type='application/json',
+                                      data=json.dumps(self.incident))
         print(response.data)
         self.assertEqual(response.status_code, 200)
-        
-
 
     def test_delete_intervention(self):
         """ Test that API can delete intervention record """
@@ -264,13 +246,12 @@ class Test_Incident(BaseTest):
                          content_type='application/json',
                          data=json.dumps(self.incident))
         response = self.client.delete('api/v2/interventions/1',
-                         headers=dict(Authorization=token),
-                         content_type='application/json',
-                         data=json.dumps(self.incident))
+                                      headers=dict(Authorization=token),
+                                      content_type='application/json',
+                                      data=json.dumps(self.incident))
         print(response.data)
         self.assertEqual(response.status_code, 200)
 
-    
     def test_only_creators_get_their_redflags(self):
         """ Test only admin can get all redflags """
         # admin = False
@@ -284,8 +265,8 @@ class Test_Incident(BaseTest):
             "username": "not admin1",
         }
         response = self.client.post('api/v2/auth/signup',
-                         data=json.dumps(user_details),
-                         content_type='application/json')
+                                    data=json.dumps(user_details),
+                                    content_type='application/json')
 
         token = json.loads(response.data.decode("utf-8"))['token']
 
@@ -294,12 +275,11 @@ class Test_Incident(BaseTest):
                          content_type='application/json',
                          data=json.dumps(self.incident))
         response1 = self.client.get('api/v2/redflags',
-                         headers=dict(Authorization=token),
-                         content_type='application/json',
-                         data=json.dumps(self.incident))
+                                    headers=dict(Authorization=token),
+                                    content_type='application/json',
+                                    data=json.dumps(self.incident))
         print(response1.data)
         self.assertEqual(response.status_code, 201)
-
 
     def test_only_creators_get_their_interventions(self):
         """ Test only admin can get all interventions """
@@ -314,19 +294,19 @@ class Test_Incident(BaseTest):
             "username": "not admin",
         }
         response = self.client.post('api/v2/auth/signup',
-                        data=json.dumps(user_details),
-                        content_type='application/json')
+                                    data=json.dumps(user_details),
+                                    content_type='application/json')
 
         token = json.loads(response.data.decode("utf-8"))['token']
 
         self.client.post('api/v2/interventions',
-                        headers=dict(Authorization=self.auth_token),
-                        content_type='application/json',
-                        data=json.dumps(self.incident))
+                         headers=dict(Authorization=self.auth_token),
+                         content_type='application/json',
+                         data=json.dumps(self.incident))
         response1 = self.client.get('api/v2/interventions',
-                        headers=dict(Authorization=token),
-                        content_type='application/json',
-                        data=json.dumps(self.incident))
+                                    headers=dict(Authorization=token),
+                                    content_type='application/json',
+                                    data=json.dumps(self.incident))
         print(response1.data)
         self.assertEqual(response.status_code, 201)
 
@@ -342,9 +322,9 @@ class Test_Incident(BaseTest):
             "type": "red-flag"
         }
         response = self.client.post('api/v2/interventions',
-                        headers=dict(Authorization=token),
-                        content_type='application/json',
-                        data=json.dumps(redflag))
+                                    headers=dict(Authorization=token),
+                                    content_type='application/json',
+                                    data=json.dumps(redflag))
         print(response.data)
         self.assertEqual(response.status_code, 400)
 
@@ -360,9 +340,9 @@ class Test_Incident(BaseTest):
             "type": "intervention"
         }
         response = self.client.post('api/v2/interventions',
-                        headers=dict(Authorization=token),
-                        content_type='application/json',
-                        data=json.dumps(redflag))
+                                    headers=dict(Authorization=token),
+                                    content_type='application/json',
+                                    data=json.dumps(redflag))
         print(response.data)
         self.assertEqual(response.status_code, 400)
 
@@ -378,9 +358,9 @@ class Test_Incident(BaseTest):
             "type": "intervention"
         }
         response = self.client.post('api/v2/interventions',
-                        headers=dict(Authorization=token),
-                        content_type='application/json',
-                        data=json.dumps(redflag))
+                                    headers=dict(Authorization=token),
+                                    content_type='application/json',
+                                    data=json.dumps(redflag))
         print(response.data)
         self.assertEqual(response.status_code, 400)
 
@@ -396,9 +376,9 @@ class Test_Incident(BaseTest):
             "type": "red-flag"
         }
         response = self.client.patch('api/v2/redflags/10/status',
-                         headers=dict(Authorization=token),
-                         content_type='application/json',
-                         data=json.dumps(redflag))
+                                     headers=dict(Authorization=token),
+                                     content_type='application/json',
+                                     data=json.dumps(redflag))
         print(response.data)
         self.assertEqual(response.status_code, 400)
 
@@ -415,15 +395,11 @@ class Test_Incident(BaseTest):
             "status": ""
         }
         response = self.client.patch('api/v2/interventions/7/status',
-                         headers=dict(Authorization=token),
-                         content_type='application/json',
-                         data=json.dumps(intervention))
+                                     headers=dict(Authorization=token),
+                                     content_type='application/json',
+                                     data=json.dumps(intervention))
         print(response.data)
         self.assertEqual(response.status_code, 400)
-
-
-
-
 
     def test_can_only_edit_redflag_location(self):
         """ Test that API can can only edit redflag location """
@@ -438,13 +414,11 @@ class Test_Incident(BaseTest):
             "type": "intervention"
         }
         response = self.client.patch('api/v2/redflags/1/location',
-                        headers=dict(Authorization=token),
-                        content_type='application/json',
-                        data=json.dumps(intervention))
+                                     headers=dict(Authorization=token),
+                                     content_type='application/json',
+                                     data=json.dumps(intervention))
         print(response.data)
         self.assertEqual(response.status_code, 400)
-        
-
 
     def test_can_only_edit_intervention_location(self):
         """ Test that API can can only edit intervention location """
@@ -459,14 +433,12 @@ class Test_Incident(BaseTest):
             "type": "red-flag"
         }
         response = self.client.patch('api/v2/interventions/1/location',
-                         headers=dict(Authorization=token),
-                         content_type='application/json',
-                         data=json.dumps(redflag))
+                                     headers=dict(Authorization=token),
+                                     content_type='application/json',
+                                     data=json.dumps(redflag))
         print(response.data)
         self.assertEqual(response.status_code, 400)
-        
 
-    
     def test_can_only_edit_redflag_comment(self):
         """ Test that API can can only edit redflag comment """
         token = self.auth_token()
@@ -480,15 +452,13 @@ class Test_Incident(BaseTest):
             "type": "intervention"
         }
         response = self.client.patch('api/v2/redflags/3/comment',
-                         headers=dict(Authorization=token),
-                         content_type='application/json',
-                         data=json.dumps(intervention))
+                                     headers=dict(Authorization=token),
+                                     content_type='application/json',
+                                     data=json.dumps(intervention))
         print(response.data)
         self.assertEqual(response.status_code, 400)
-        
 
-
-    def  test_can_only_edit_intervention_comment(self):
+    def test_can_only_edit_intervention_comment(self):
         """ Test that API can can only intervention redflag comment """
         token = self.auth_token()
         redflag = {
@@ -501,13 +471,11 @@ class Test_Incident(BaseTest):
             "type": "red-flag"
         }
         response = self.client.patch('api/v2/interventions/7/comment',
-                         headers=dict(Authorization=token),
-                         content_type='application/json',
-                         data=json.dumps(redflag))
+                                     headers=dict(Authorization=token),
+                                     content_type='application/json',
+                                     data=json.dumps(redflag))
         print(response.data)
         self.assertEqual(response.status_code, 400)
-        
-
 
     def test_can_only_edit_redflag_status(self):
         """ Test that API can only edit redflag status """
@@ -526,12 +494,12 @@ class Test_Incident(BaseTest):
                          content_type='application/json',
                          data=json.dumps(intervention))
         response = self.client.patch('api/v2/redflags/10/status',
-                         headers=dict(Authorization=token),
-                         content_type='application/json',
-                         data=json.dumps(intervention))
+                                     headers=dict(Authorization=token),
+                                     content_type='application/json',
+                                     data=json.dumps(intervention))
         print(response.data)
         self.assertEqual(response.status_code, 400)
-        
+
     def test_can_only_edit_intervention_status(self):
         """ Test that API can only edit intervention status """
         token = self.auth_token()
@@ -549,8 +517,8 @@ class Test_Incident(BaseTest):
                          content_type='application/json',
                          data=json.dumps(redflag))
         response = self.client.patch('api/v2/redflags/10/status',
-                         headers=dict(Authorization=token),
-                         content_type='application/json',
-                         data=json.dumps(redflag))
+                                     headers=dict(Authorization=token),
+                                     content_type='application/json',
+                                     data=json.dumps(redflag))
         print(response.data)
         self.assertEqual(response.status_code, 400)

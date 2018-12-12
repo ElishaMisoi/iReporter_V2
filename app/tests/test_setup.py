@@ -7,10 +7,11 @@ from app.db import create_tables
 create_tables.drop_tables()
 create_tables.create_tables()
 
+
 class BaseTest(unittest.TestCase):
     def setUp(self):
         self.client = app.test_client()
-        
+
         self.incident = {
             "id": "1",
             "location": "Nairobi",
@@ -19,7 +20,7 @@ class BaseTest(unittest.TestCase):
             "Images": "image1, image2",
             "Videos": "video1, video2"
         }
-        
+
     ''' Generate auth token '''
 
     def auth_token(self):
@@ -42,4 +43,4 @@ class BaseTest(unittest.TestCase):
                                     data=json.dumps(user_details),
                                     content_type='application/json')
         user_jwt = json.loads(response.data.decode("utf-8"))['token']
-        return user_jwt    
+        return user_jwt

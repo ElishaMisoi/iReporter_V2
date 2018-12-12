@@ -19,6 +19,7 @@ class SignUpSchema(Schema):
     phoneNumber = fields.Str(required=True, validate=(required))
     isAdmin = fields.Str(required=False)
 
+
 class SignInSchema(Schema):
     # Represents the schema for users
     email = fields.Email(required=True, validate=(email))
