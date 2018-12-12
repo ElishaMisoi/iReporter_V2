@@ -17,7 +17,7 @@ class SignUpSchema(Schema):
     othernames = fields.Str(required=True, validate=(required))
     password = fields.Str(required=True, validate=(required))
     phoneNumber = fields.Str(required=True, validate=(required))
-
+    isAdmin = fields.Str(required=False)
 
 class SignInSchema(Schema):
     # Represents the schema for users
@@ -64,12 +64,16 @@ def create_user():
 
     user = User(data['email'], data['password'])
 
+    if not data.get('isAdmin', '').strip():
+        data['isAdmin'] = "False"
+
     register = user.signup(
         data['username'],
         data['firstname'],
         data['lastname'],
         data['othernames'],
         data['phoneNumber'],
+        data['isAdmin']
     )
     close_connection(conn)
 
@@ -130,13 +134,13 @@ def delete_user(identity, user_id):
     cur.execute("select * from users where id = '{}'".format(user_id))
     users = cur.fetchall()
 
-    if len(users < 0):
+    if not users:
         close_connection(conn)
         return jsonify({
             "message": "User does not exist"
         }), 200
 
-    cur.execute("delete * from users where id = {}".format(user_id))
+    cur.execute("delete from users where id = {}".format(user_id))
     conn.commit()
     close_connection(conn)
     return jsonify({

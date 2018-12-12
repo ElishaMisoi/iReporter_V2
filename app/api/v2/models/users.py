@@ -15,7 +15,7 @@ class User:
         self.email = email
         self.password = password
 
-    def signup(self, username, firstname, lastname, othernames, phoneNumber):
+    def signup(self, username, firstname, lastname, othernames, phoneNumber, isAdmin):
         # registering a new user
         user_exists = self.user_exists()
 
@@ -28,25 +28,22 @@ class User:
 
         else:
             hashed_pw = pwd_hash.encrypt(self.password)
-            conn = open_connection()
-            cur = conn.cursor()
 
             cur.execute(
-                "INSERT INTO users(firstname, lastname, othernames, email, phoneNumber, username, password) values('{}','{}','{}','{}','{}','{}','{}')".format(
+                "INSERT INTO users(firstname, lastname, othernames, email, phoneNumber, username, password, isAdmin) values('{}','{}','{}','{}','{}','{}','{}','{}')".format(
                     firstname,
                     lastname,
                     othernames,
                     self.email,
                     phoneNumber,
                     username,
-                    hashed_pw))
+                    hashed_pw, isAdmin))
 
             cur.execute(
                 "select id from users where email = '{}' ".format(
                     self.email))
             user_id = cur.fetchone()[0]
             token = self.generate_token(user_id)
-            cur.close()
             conn.commit()
 
             user_info = self.get_user_details()
