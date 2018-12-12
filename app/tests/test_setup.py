@@ -4,18 +4,22 @@ from app import app
 
 from app.db import create_tables
 
+create_tables.drop_tables()
+create_tables.create_tables()
 
 class BaseTest(unittest.TestCase):
     def setUp(self):
-        create_tables.create_tables()
         self.client = app.test_client()
+        
         self.incident = {
+            "id": "1",
             "location": "Nairobi",
             "status": "draft",
             "comment": "another one",
             "Images": "image1, image2",
             "Videos": "video1, video2"
         }
+        
     ''' Generate auth token '''
 
     def auth_token(self):
@@ -28,7 +32,8 @@ class BaseTest(unittest.TestCase):
             "email": "authemail@email.com",
             "password": "1234555",
             "phoneNumber": "12345678",
-            "username": "test_user69"
+            "username": "test_user69",
+            "isAdmin": "True"
         }
         self.client.post('api/v2/auth/signup',
                          data=json.dumps(user_details),
@@ -37,8 +42,4 @@ class BaseTest(unittest.TestCase):
                                     data=json.dumps(user_details),
                                     content_type='application/json')
         user_jwt = json.loads(response.data.decode("utf-8"))['token']
-        return user_jwt
-
-
-def drop_tables(self):
-    create_tables.drop_tables()
+        return user_jwt    

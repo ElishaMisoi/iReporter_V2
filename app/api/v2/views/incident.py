@@ -1,5 +1,6 @@
 from flask import Flask, jsonify, request
 from marshmallow import ValidationError, Schema, fields
+from psycopg2.extras import RealDictCursor
 import datetime
 
 from app import app
@@ -10,7 +11,7 @@ from app.api.v2.common.authenticator import authenticate
 from app.db.config import open_connection, close_connection
 
 conn = open_connection()
-cur = conn.cursor()
+cur = conn.cursor(cursor_factory=RealDictCursor)
 
 
 class IncidentSchema(Schema):
@@ -133,7 +134,7 @@ def edit_redflag_status(identity, redflag_id):
     else:
         return jsonify({
             "errors": "You have no permissions to edit this record. Contact the administrator",
-            "status": 400}), 400
+            "status": 401}), 401
 
 
 @api.route('/interventions/<int:intervention_id>/status', methods=['PATCH'])
@@ -167,7 +168,7 @@ def edit_intervention_status(identity, intervention_id):
     else:
         return jsonify({
             "errors": "You have no permissions to edit this record. Contact the administrator",
-            "status": 400}), 400
+            "status": 401}), 401
 
 
 @api.route('/redflags/<int:redflag_id>/location', methods=['PATCH'])
@@ -282,7 +283,7 @@ def edit_incident(update_type, incident_id, update_record, type, indentity):
         "select * from incidents where id = '{}' and type = '{}'".format(incident_id, type))
     incident = cur.fetchone()
 
-    if not incident:
+    if incident == None:
         return jsonify({
             "status": 404,
             "message": "The " + type + " record was not found"
@@ -294,7 +295,7 @@ def edit_incident(update_type, incident_id, update_record, type, indentity):
         cur.execute(query)
         return jsonify({
             "status": 200,
-            "message": "Updated " + incident[3] + " record's " + update_type
+            "message": "Updated " + incident['type'] + " record's " + update_type
         }), 200
     else:
         return jsonify({
@@ -309,6 +310,11 @@ def get_single_redflag(identity, redflag_id):
     # getting a single redflag
     if verified(identity):
         return get_single_incident(redflag_id, 'red-flag')
+    else:
+        return jsonify({
+            "status": 401,
+            "message": "You do not have permissions to view this record"
+        }), 401
 
 
 @api.route('/interventions/<int:intervention_id>', methods=['GET'])
@@ -317,6 +323,11 @@ def get_single_intervention(identity, intervention_id):
     # getting a intervention redflag
     if verified(identity):
         return get_single_incident(intervention_id, 'intervention')
+    else:
+        return jsonify({
+            "status": 401,
+            "message": "You do not have permissions to view this record"
+        }), 401
 
 
 def get_single_incident(incident_id, type):
@@ -324,7 +335,7 @@ def get_single_incident(incident_id, type):
         "select * from incidents where id = '{}' and type = '{}'".format(incident_id, type))
     incident = cur.fetchone()
 
-    if not incident:
+    if incident is None:
         return jsonify({
             "status": 404,
             "message": "The " + type + " record was not found"
@@ -342,6 +353,11 @@ def delete_redflag(identity, redflags_id):
     # deleting a red-flag record
     if verified(identity):
         return delete_incident(redflags_id, 'red-flag')
+    else:
+        return jsonify({
+            "status": 401,
+            "message": "You do not have permissions to delete this record"
+        }), 401
 
 
 @api.route('/interventions/<int:intervention_id>', methods=['DELETE'])
@@ -350,6 +366,11 @@ def delete_intervention(identity, intervention_id):
     # deleting an intervention record
     if verified(identity):
         return delete_incident(intervention_id, 'intervention')
+    else:
+        return jsonify({
+            "status": 401,
+            "message": "You do not have permissions to view this record"
+        }), 401
 
 
 def delete_incident(incident_id, type):
@@ -373,15 +394,14 @@ def delete_incident(incident_id, type):
 def isAdmin(user_id):
     cur.execute("select * from users where id = '{}'".format(user_id))
     user = cur.fetchone()
-    print(user)
-    return user[9]
+    return user['isadmin']
 
 
 def verified(user_id):
     cur.execute(
         "select * from incidents where createdBy = '{}'".format(user_id))
     incident = cur.fetchone()
-    if not incident and isAdmin(user_id) == False:
+    if incident is None and isAdmin(user_id) == False:
         return False
     return True
 

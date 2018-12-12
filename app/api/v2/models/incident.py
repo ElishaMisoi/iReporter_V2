@@ -1,9 +1,10 @@
 from flask import jsonify
+from psycopg2.extras import RealDictCursor
 
 from app.db.config import open_connection, close_connection
 
 conn = open_connection()
-cur = conn.cursor()
+cur = conn.cursor(cursor_factory=RealDictCursor)
 
 
 class Incident:
@@ -20,8 +21,6 @@ class Incident:
 
     def create_incident(self):
         # creating an incident
-        conn = open_connection()
-        cur = conn.cursor()
         cur.execute(
             "INSERT INTO incidents(createdBy, type, location, status, Images, Videos, comment) values('{}','{}','{}','{}','{}','{}','{}')".format(
                 self.createdBy,
@@ -34,8 +33,6 @@ class Incident:
         conn.commit()
         cur.execute("select * from incidents")
         incident = cur.fetchall()[-1]
-
-        cur.close()
 
         print(incident)
         incident_type = ''
