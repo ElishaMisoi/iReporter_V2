@@ -23,7 +23,7 @@ class BaseTest(unittest.TestCase):
 
     ''' Generate auth token '''
 
-    def auth_token(self):
+    def user_auth_token(self):
         ''' Register a new user '''
 
         user_details = {
@@ -34,6 +34,27 @@ class BaseTest(unittest.TestCase):
             "password": "1234555",
             "phoneNumber": "12345678",
             "username": "test_user69",
+        }
+        self.client.post('api/v2/auth/signup',
+                         data=json.dumps(user_details),
+                         content_type='application/json')
+        response = self.client.post('api/v2/auth/login',
+                                    data=json.dumps(user_details),
+                                    content_type='application/json')
+        user_jwt = json.loads(response.data.decode("utf-8"))['token']
+        return user_jwt
+
+    def admin_auth_token(self):
+        ''' Register a new user '''
+
+        user_details = {
+            "firstname": "test_firstn",
+            "lastname": "test_lastname",
+            "othernames": "test_othernames",
+            "email": "test_admin@email.com",
+            "password": "1234555",
+            "phoneNumber": "12345678",
+            "username": "test_admin",
             "isAdmin": "True"
         }
         self.client.post('api/v2/auth/signup',
