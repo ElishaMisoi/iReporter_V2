@@ -5,7 +5,7 @@ import datetime
 
 from app import app
 from app.api.v2.models.incident import Incident
-from app.api.v2.common.validator import email, required
+from app.api.v2.common.validator import email, required, verifyStatus, verifyType
 from app.api.v2.views import api
 from app.api.v2.common.authenticator import authenticate
 from app.db.config import open_connection, close_connection
@@ -27,32 +27,53 @@ class IncidentSchema(Schema):
     Videos = fields.Str(required=False)
 
 
+class IncidentStatusSchema(Schema):
+    # Represents the schema for incidents status edit
+    type = fields.Str(required=True, validate=(verifyType))
+    comment = fields.Str(required=True, validate=(required))
+    location = fields.Str(required=True, validate=(required))
+    id = fields.Int(required=False)
+    createdOn = fields.Str(required=False)
+    createdBy = fields.Int(required=False)
+    Images = fields.Str(required=False)
+    status = fields.Str(required=True, validate=(verifyStatus))
+    Videos = fields.Str(required=False)
+
+
 @api.route('/redflags', methods=['POST'])
 @authenticate
 def create_redflag(identity):
     # creating a red-flag
-    data, errors = IncidentSchema().load(request.get_json())
+    if not isAdmin(identity):
+        data, errors = IncidentSchema().load(request.get_json())
 
-    if errors:
-        return jsonify({
-            "errors": errors,
-            "status": 400}), 400
+        if errors:
+            return jsonify({
+                "errors": errors,
+                "status": 400}), 400
 
-    return create_incident(identity, data, 'red-flag')
+        return create_incident(identity, data, 'red-flag')
+    return jsonify({
+        "errors": "Administrator cannot create a redf-flag record",
+        "status": 401}), 401
 
 
 @api.route('/interventions', methods=['POST'])
 @authenticate
 def create_intervension(identity):
     # creating a red-flag
-    data, errors = IncidentSchema().load(request.get_json())
+    if not isAdmin(identity):
+        data, errors = IncidentSchema().load(request.get_json())
 
-    if errors:
-        return jsonify({
-            "errors": errors,
-            "status": 400}), 400
+        if errors:
+            return jsonify({
+                "errors": errors,
+                "status": 400}), 400
 
-    return create_incident(identity, data, 'intervention')
+        return create_incident(identity, data, 'intervention')
+    return jsonify({
+        "errors": "Administrator cannot create an intervention record",
+        "status": 401}), 401
 
 
 def create_incident(identity, data, type):
@@ -92,9 +113,9 @@ def get_incidents(type, identity):
 
     if not incidents:
         return jsonify({
-            "status": 200,
+            "status": 404,
             "message": "There are no " + type + "s"
-        }), 200
+        }), 404
 
     return jsonify({
         "status": 200,
@@ -108,7 +129,7 @@ def edit_redflag_status(identity, redflag_id):
     # editing status of a red-flag record
 
     if isAdmin(identity):
-        data, errors = IncidentSchema().load(request.get_json())
+        data, errors = IncidentStatusSchema().load(request.get_json())
 
         if errors:
             return jsonify({
@@ -142,7 +163,7 @@ def edit_redflag_status(identity, redflag_id):
 def edit_intervention_status(identity, intervention_id):
     # editing status of an intervention record
     if isAdmin(identity):
-        data, errors = IncidentSchema().load(request.get_json())
+        data, errors = IncidentStatusSchema().load(request.get_json())
         if errors:
             return jsonify({
                 "errors": errors,
@@ -283,7 +304,7 @@ def edit_incident(update_type, incident_id, update_record, type, indentity):
         "select * from incidents where id = '{}' and type = '{}'".format(incident_id, type))
     incident = cur.fetchone()
 
-    if incident == None:
+    if incident is None:
         return jsonify({
             "status": 404,
             "message": "The " + type + " record was not found"
@@ -293,10 +314,8 @@ def edit_incident(update_type, incident_id, update_record, type, indentity):
         query = "update incidents set " + update_type + \
             " = '{}' where id = '{}'".format(update_record, incident_id)
         cur.execute(query)
-        return jsonify({
-            "status": 200,
-            "message": "Updated " + incident['type'] + " record's " + update_type
-        }), 200
+        return jsonify({"status": 200, "message": "Updated " +
+                        incident['type'] + " record's " + update_type}), 200
     else:
         return jsonify({
             "status": 401,
@@ -380,9 +399,9 @@ def delete_incident(incident_id, type):
 
     if not incident:
         return jsonify({
-            "status": 200,
+            "status": 404,
             "message": "The " + type + " record was not found"
-        }), 200
+        }), 404
 
     cur.execute("delete from incidents where id = '{}'".format(incident_id))
     conn.commit()

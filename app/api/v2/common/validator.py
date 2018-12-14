@@ -37,3 +37,19 @@ def verifyStatus(value):
             'The status can only be accepted, rejected, under investigation or draft')
 
     return value
+
+
+def verifyType(value):
+    """Validate type matches the required types"""
+
+    if isinstance(value, str):
+        if not value.strip(' '):
+            raise ValidationError('Record type cannot be null')
+
+    types = ['red-flag', 'intervention']
+
+    if value not in types:
+        raise ValidationError(
+            'The record type can only be red-flag and intervention')
+
+    return value
