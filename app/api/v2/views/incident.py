@@ -10,6 +10,7 @@ from app.api.v2.common.validator import email, required, verifyStatus, verifyTyp
 from app.api.v2.views import api
 from app.api.v2.common.authenticator import authenticate
 from app.db.config import open_connection, close_connection
+from app.api.v2.views.errors import permission_Error, admin_permission_Error, emptyPayload
 
 email = ""
 password = ""
@@ -49,6 +50,9 @@ def create_redflag(identity):
     # creating a red-flag
     if not isAdmin(identity):
         data, errors = IncidentSchema().load(request.get_json())
+
+        if not data:
+            return emptyPayload()
 
         if errors:
             return jsonify({
@@ -316,10 +320,7 @@ def edit_incident(update_type, incident_id, update_record, type, indentity):
         return jsonify({"status": 200, "message": "Updated " +
                         incident['type'] + " record's " + update_type}), 200
     else:
-        return jsonify({
-            "status": 401,
-            "message": "You have no permissions to edit this record"
-        }), 401
+        return permission_Error()
 
 
 @api.route('/redflags/<int:redflag_id>', methods=['GET'])
@@ -366,10 +367,7 @@ def delete_redflag(identity, redflags_id):
     if verified(identity):
         return delete_incident(redflags_id, 'red-flag')
     else:
-        return jsonify({
-            "status": 401,
-            "message": "You do not have permissions to delete this record"
-        }), 401
+        return permission_Error()
 
 
 @api.route('/interventions/<int:intervention_id>', methods=['DELETE'])
@@ -438,37 +436,25 @@ def sendEmail(user_id, incident_type, status):
     except BaseException:
         print('email failed to send')
 
-
-def permission_Error():
-    return jsonify({
-            "status": 401,
-            "message": "You do not have permissions to view this record"
-        }), 401
-
-def admin_permission_Error():
-    return jsonify({
-        "errors": "Administrator cannot create an incident record",
-        "status": 401}), 401
-
 @app.errorhandler(404)
 def not_found(error):
     '''404 Error function'''
-    return (jsonify({'error': str(error)}), 404)
+    return (jsonify({'error': 'Sorry :( We could not find what you are looking for.'}), 404)
 
 
 @app.errorhandler(400)
 def bad_request(error):
     '''400 Error function'''
-    return (jsonify({'error': str(error)}), 400)
+    return (jsonify({'error': 'Error in the payload. Please verify that your payload is in the correct format'}), 400)
 
 
 @app.errorhandler(405)
 def method_not_allowed(error):
     '''405 Error function'''
-    return (jsonify({'error': str(error)}), 405)
+    return (jsonify({'error': 'The method provided is not allowed for the endpoint used.'}), 405)
 
 
 @app.errorhandler(500)
 def server_error(error):
     '''405 Error function'''
-    return (jsonify({'error': str(error)}), 500)
+    return (jsonify({'error': 'Oops! Something happened :( Internal server error.'}), 500)

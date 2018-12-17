@@ -5,7 +5,7 @@ import os
 base_url = os.getenv('DATABASE_URL')
 
 # test db url
-test_url = "dbname=ireporter_testdb host=localhost port=5432 user=elishamisoi password=postgres"
+test_url = os.getenv('TEST_DATABASE_URL')
 
 
 def init_db():
