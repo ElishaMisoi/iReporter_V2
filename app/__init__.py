@@ -6,6 +6,7 @@ from flask import jsonify
 create_tables.create_tables()
 app = Flask(__name__)
 
+
 @app.errorhandler(404)
 def not_found(error):
     '''404 Error function'''

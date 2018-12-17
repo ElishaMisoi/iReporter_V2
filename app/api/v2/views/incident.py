@@ -2,6 +2,7 @@ from flask import Flask, jsonify, request
 from marshmallow import ValidationError, Schema, fields
 from psycopg2.extras import RealDictCursor
 import datetime
+import smtplib
 
 from app import app
 from app.api.v2.models.incident import Incident
@@ -10,6 +11,8 @@ from app.api.v2.views import api
 from app.api.v2.common.authenticator import authenticate
 from app.db.config import open_connection, close_connection
 
+email = ""
+password = ""
 conn = open_connection()
 cur = conn.cursor(cursor_factory=RealDictCursor)
 
@@ -53,9 +56,7 @@ def create_redflag(identity):
                 "status": 400}), 400
 
         return create_incident(identity, data, 'red-flag')
-    return jsonify({
-        "errors": "Administrator cannot create a redf-flag record",
-        "status": 401}), 401
+    return admin_permission_Error()
 
 
 @api.route('/interventions', methods=['POST'])
@@ -71,16 +72,15 @@ def create_intervension(identity):
                 "status": 400}), 400
 
         return create_incident(identity, data, 'intervention')
-    return jsonify({
-        "errors": "Administrator cannot create an intervention record",
-        "status": 401}), 401
+    return admin_permission_Error()
 
 
 def create_incident(identity, data, type):
     # creating an incident
     createdBy = identity
+    status = 'draft'
     incident = Incident(createdBy, type, data['location'],
-                        data['status'],
+                        status,
                         data['Images'], data['Videos'], data['comment'])
     response = incident.create_incident()
     return response
@@ -153,15 +153,14 @@ def edit_redflag_status(identity, redflag_id):
             'red-flag',
             identity)
     else:
-        return jsonify({
-            "errors": "You have no permissions to edit this record. Contact the administrator",
-            "status": 401}), 401
+        return permission_Error()
 
 
 @api.route('/interventions/<int:intervention_id>/status', methods=['PATCH'])
 @authenticate
 def edit_intervention_status(identity, intervention_id):
     # editing status of an intervention record
+
     if isAdmin(identity):
         data, errors = IncidentStatusSchema().load(request.get_json())
         if errors:
@@ -187,9 +186,7 @@ def edit_intervention_status(identity, intervention_id):
             identity)
 
     else:
-        return jsonify({
-            "errors": "You have no permissions to edit this record. Contact the administrator",
-            "status": 401}), 401
+        return permission_Error()
 
 
 @api.route('/redflags/<int:redflag_id>/location', methods=['PATCH'])
@@ -314,6 +311,8 @@ def edit_incident(update_type, incident_id, update_record, type, indentity):
         query = "update incidents set " + update_type + \
             " = '{}' where id = '{}'".format(update_record, incident_id)
         cur.execute(query)
+        if update_type == 'status':
+            sendEmail(indentity, type, update_record)
         return jsonify({"status": 200, "message": "Updated " +
                         incident['type'] + " record's " + update_type}), 200
     else:
@@ -330,10 +329,7 @@ def get_single_redflag(identity, redflag_id):
     if verified(identity):
         return get_single_incident(redflag_id, 'red-flag')
     else:
-        return jsonify({
-            "status": 401,
-            "message": "You do not have permissions to view this record"
-        }), 401
+        return permission_Error()
 
 
 @api.route('/interventions/<int:intervention_id>', methods=['GET'])
@@ -343,10 +339,7 @@ def get_single_intervention(identity, intervention_id):
     if verified(identity):
         return get_single_incident(intervention_id, 'intervention')
     else:
-        return jsonify({
-            "status": 401,
-            "message": "You do not have permissions to view this record"
-        }), 401
+        return permission_Error()
 
 
 def get_single_incident(incident_id, type):
@@ -386,10 +379,7 @@ def delete_intervention(identity, intervention_id):
     if verified(identity):
         return delete_incident(intervention_id, 'intervention')
     else:
-        return jsonify({
-            "status": 401,
-            "message": "You do not have permissions to view this record"
-        }), 401
+        return permission_Error()
 
 
 def delete_incident(incident_id, type):
@@ -424,6 +414,41 @@ def verified(user_id):
         return False
     return True
 
+
+def sendEmail(user_id, incident_type, status):
+    cur.execute("select * from users where id = '{}'".format(user_id))
+    user = cur.fetchone()
+    FROM = email
+    TO = user['email']
+    SUBJECT = "iReporter Status Changed"
+    TEXT = "Your " + incident_type + " status has changed to " + status
+
+    message = """From: %s\nTo: %s\nSubject: %s\n\n%s
+    """ % (FROM, ", ".join(TO), SUBJECT, TEXT)
+
+    try:
+        smtpserver = smtplib.SMTP("smtp.gmail.com", 587)
+        smtpserver.ehlo()
+        smtpserver.starttls()
+        smtpserver.ehlo()
+        smtpserver.login(email, password)
+        smtpserver.sendmail(FROM, TO, message)
+        smtpserver.close()
+        print('email successfully sent')
+    except BaseException:
+        print('email failed to send')
+
+
+def permission_Error():
+    return jsonify({
+            "status": 401,
+            "message": "You do not have permissions to view this record"
+        }), 401
+
+def admin_permission_Error():
+    return jsonify({
+        "errors": "Administrator cannot create an incident record",
+        "status": 401}), 401
 
 @app.errorhandler(404)
 def not_found(error):
