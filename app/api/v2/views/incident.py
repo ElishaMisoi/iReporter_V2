@@ -10,7 +10,7 @@ from app.api.v2.common.validator import email, required, verifyStatus, verifyTyp
 from app.api.v2.views import api
 from app.api.v2.common.authenticator import authenticate
 from app.db.config import open_connection, close_connection
-from app.api.v2.views.errors import permission_Error, admin_permission_Error, emptyPayload
+from app.api.v2.views.errors import error_response
 
 email = ""
 password = ""
@@ -51,16 +51,13 @@ def create_redflag(identity):
     if not isAdmin(identity):
         data, errors = IncidentSchema().load(request.get_json())
 
-        if not data:
-            return emptyPayload()
-
         if errors:
             return jsonify({
                 "errors": errors,
                 "status": 400}), 400
 
         return create_incident(identity, data, 'red-flag')
-    return admin_permission_Error()
+    return error_response(403, "Administrator cannot create an incident record")
 
 
 @api.route('/interventions', methods=['POST'])
@@ -76,7 +73,7 @@ def create_intervension(identity):
                 "status": 400}), 400
 
         return create_incident(identity, data, 'intervention')
-    return admin_permission_Error()
+    return error_response(403, "Administrator cannot create an incident record")
 
 
 def create_incident(identity, data, type):
@@ -157,7 +154,7 @@ def edit_redflag_status(identity, redflag_id):
             'red-flag',
             identity)
     else:
-        return permission_Error()
+        return error_response(403, "You do not have permissions to access this record")
 
 
 @api.route('/interventions/<int:intervention_id>/status', methods=['PATCH'])
@@ -190,7 +187,7 @@ def edit_intervention_status(identity, intervention_id):
             identity)
 
     else:
-        return permission_Error()
+        return error_response(403, "You do not have permissions to access this record")
 
 
 @api.route('/redflags/<int:redflag_id>/location', methods=['PATCH'])
@@ -320,7 +317,7 @@ def edit_incident(update_type, incident_id, update_record, type, indentity):
         return jsonify({"status": 200, "message": "Updated " +
                         incident['type'] + " record's " + update_type}), 200
     else:
-        return permission_Error()
+        return error_response(403, "You do not have permissions to access this record")
 
 
 @api.route('/redflags/<int:redflag_id>', methods=['GET'])
@@ -330,7 +327,7 @@ def get_single_redflag(identity, redflag_id):
     if verified(identity):
         return get_single_incident(redflag_id, 'red-flag')
     else:
-        return permission_Error()
+        return error_response(403, "You do not have permissions to access this record")
 
 
 @api.route('/interventions/<int:intervention_id>', methods=['GET'])
@@ -340,7 +337,7 @@ def get_single_intervention(identity, intervention_id):
     if verified(identity):
         return get_single_incident(intervention_id, 'intervention')
     else:
-        return permission_Error()
+        return error_response(403, "You do not have permissions to access this record")
 
 
 def get_single_incident(incident_id, type):
@@ -367,7 +364,7 @@ def delete_redflag(identity, redflags_id):
     if verified(identity):
         return delete_incident(redflags_id, 'red-flag')
     else:
-        return permission_Error()
+        return error_response(403, "You do not have permissions to access this record")
 
 
 @api.route('/interventions/<int:intervention_id>', methods=['DELETE'])
@@ -377,7 +374,7 @@ def delete_intervention(identity, intervention_id):
     if verified(identity):
         return delete_incident(intervention_id, 'intervention')
     else:
-        return permission_Error()
+        return error_response(403, "You do not have permissions to access this record")
 
 
 def delete_incident(incident_id, type):
