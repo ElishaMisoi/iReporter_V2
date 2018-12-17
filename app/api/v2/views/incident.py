@@ -2,6 +2,7 @@ from flask import Flask, jsonify, request
 from marshmallow import ValidationError, Schema, fields
 from psycopg2.extras import RealDictCursor
 import datetime
+import smtplib
 
 from app import app
 from app.api.v2.models.incident import Incident
@@ -10,6 +11,8 @@ from app.api.v2.views import api
 from app.api.v2.common.authenticator import authenticate
 from app.db.config import open_connection, close_connection
 
+email = ""
+password = ""
 conn = open_connection()
 cur = conn.cursor(cursor_factory=RealDictCursor)
 
@@ -79,8 +82,9 @@ def create_intervension(identity):
 def create_incident(identity, data, type):
     # creating an incident
     createdBy = identity
+    status = 'draft'
     incident = Incident(createdBy, type, data['location'],
-                        data['status'],
+                        status,
                         data['Images'], data['Videos'], data['comment'])
     response = incident.create_incident()
     return response
@@ -314,6 +318,8 @@ def edit_incident(update_type, incident_id, update_record, type, indentity):
         query = "update incidents set " + update_type + \
             " = '{}' where id = '{}'".format(update_record, incident_id)
         cur.execute(query)
+        if update_type == 'status':
+            sendEmail(indentity, type, update_record)
         return jsonify({"status": 200, "message": "Updated " +
                         incident['type'] + " record's " + update_type}), 200
     else:
@@ -423,6 +429,29 @@ def verified(user_id):
     if incident is None and isAdmin(user_id) == False:
         return False
     return True
+
+def sendEmail(user_id, incident_type, status):
+    cur.execute("select * from users where id = '{}'".format(user_id))
+    user = cur.fetchone()
+    FROM = email
+    TO = user['email']
+    SUBJECT = "iReporter Status Changed"
+    TEXT = "Your " + incident_type + " status has changed to " + status
+
+    message = """From: %s\nTo: %s\nSubject: %s\n\n%s
+    """ % (FROM, ", ".join(TO), SUBJECT, TEXT)
+
+    try:  
+        smtpserver = smtplib.SMTP("smtp.gmail.com", 587)
+        smtpserver.ehlo()
+        smtpserver.starttls()
+        smtpserver.ehlo()
+        smtpserver.login(email, password)
+        smtpserver.sendmail(FROM, TO, message)
+        smtpserver.close()
+        print('email successfully sent')
+    except:
+        print('email failed to send')
 
 
 @app.errorhandler(404)
