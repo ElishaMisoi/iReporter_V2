@@ -1,3 +1,5 @@
+from passlib.apps import custom_app_context as pwd_hash
+
 from app.db.config import open_connection, open_testDb_connection, close_connection
 
 QUERIES = [
@@ -81,3 +83,26 @@ def drop_test_tables():
 
     cur.close()
     conn.commit()
+
+
+def create_super_admin():
+    # creating super admin
+    try:
+        _password = pwd_hash.encrypt('1211')
+        query = """INSERT INTO users(firstname, lastname, othernames, email, phoneNumber, username, password, isAdmin) VALUES(
+                    'admin1211',
+                    'admin1211',
+                    'admin1211',
+                    'admin@admin.com',
+                    '07000000000',
+                    'admin1211',
+                    '{}', 'True')""".format(
+            _password)
+
+        conn = open_connection()
+        cur = conn.cursor()
+        cur.execute(query)
+        cur.close()
+        conn.commit()
+    except Exception as e:
+        pass
