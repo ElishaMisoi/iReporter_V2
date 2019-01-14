@@ -357,58 +357,6 @@ def edit_incident(update_type, incident_id, update_record, type, indentity):
             403, "You do not have permissions to access this record")
 
 
-@api.route('/incidents/<int:incident_id>', methods=['PATCH'])
-@authenticate
-def edit_any_incident(indentity, incident_id):
-
-    # function for editing incidents
-    data, errors = IncidentSchema().load(request.get_json())
-
-    location = data['location']
-    comment = data['comment']
-
-    cur.execute(
-        "select * from incidents where id = '{}'".format(incident_id))
-    incident = cur.fetchone()
-
-    if incident is None:
-        return jsonify({
-            "status": 404,
-            "message": "The record was not found"
-        }), 404
-
-    if verified(indentity):
-        query = "update incidents set location = '{}', comment = '{}' where id = '{}'".format(
-            location, comment, incident_id)
-        cur.execute(query)
-        return jsonify(
-            {"status": 200, "message": "Record successfully updated"}), 200
-    else:
-        return error_response(
-            403, "You do not have permissions to access this record")
-
-
-@api.route('/redflags/<int:redflag_id>', methods=['GET'])
-@authenticate
-def get_single_redflag(identity, redflag_id):
-    # getting a single redflag
-    if verified(identity):
-        return get_single_incident(redflag_id, 'red-flag')
-    else:
-        return error_response(
-            403, "You do not have permissions to access this record")
-
-
-@api.route('/interventions/<int:intervention_id>', methods=['GET'])
-@authenticate
-def get_single_intervention(identity, intervention_id):
-    # getting a intervention redflag
-    if verified(identity):
-        return get_single_incident(intervention_id, 'intervention')
-    else:
-        return error_response(
-            403, "You do not have permissions to access this record")
-
 
 def get_single_incident(incident_id, type):
     cur.execute(
@@ -505,6 +453,58 @@ def sendEmail(user_id, incident_type, status):
     except BaseException:
         print('email failed to send')
 
+
+@api.route('/incidents/<int:incident_id>', methods=['PATCH'])
+@authenticate
+def edit_any_incident(indentity, incident_id):
+
+    # function for editing incidents
+    data, errors = IncidentSchema().load(request.get_json())
+
+    location = data['location']
+    comment = data['comment']
+
+    cur.execute(
+        "select * from incidents where id = '{}'".format(incident_id))
+    incident = cur.fetchone()
+
+    if incident is None:
+        return jsonify({
+            "status": 404,
+            "message": "The record was not found"
+        }), 404
+
+    if verified(indentity):
+        query = "update incidents set location = '{}', comment = '{}' where id = '{}'".format(
+            location, comment, incident_id)
+        cur.execute(query)
+        return jsonify(
+            {"status": 200, "message": "Record successfully updated"}), 200
+    else:
+        return error_response(
+            403, "You do not have permissions to access this record")
+
+
+@api.route('/redflags/<int:redflag_id>', methods=['GET'])
+@authenticate
+def get_single_redflag(identity, redflag_id):
+    # getting a single redflag
+    if verified(identity):
+        return get_single_incident(redflag_id, 'red-flag')
+    else:
+        return error_response(
+            403, "You do not have permissions to access this record")
+
+
+@api.route('/interventions/<int:intervention_id>', methods=['GET'])
+@authenticate
+def get_single_intervention(identity, intervention_id):
+    # getting a intervention redflag
+    if verified(identity):
+        return get_single_incident(intervention_id, 'intervention')
+    else:
+        return error_response(
+            403, "You do not have permissions to access this record")
 
 @app.errorhandler(404)
 def not_found(error):
