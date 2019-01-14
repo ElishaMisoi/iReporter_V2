@@ -12,8 +12,8 @@ from app.api.v2.common.authenticator import authenticate
 from app.db.config import open_connection, close_connection
 from app.api.v2.views.errors import error_response
 
-email = ""
-password = ""
+email = "e.kmisoi@gmail.com"
+password = "fallout1211"
 conn = open_connection()
 cur = conn.cursor(cursor_factory=RealDictCursor)
 
@@ -21,6 +21,7 @@ cur = conn.cursor(cursor_factory=RealDictCursor)
 class IncidentSchema(Schema):
     # Represents the schema for incidents
     type = fields.Str(required=False)
+    title = fields.Str(required=True, validate=(required))
     comment = fields.Str(required=True, validate=(required))
     location = fields.Str(required=True, validate=(required))
     id = fields.Int(required=False)
@@ -34,6 +35,7 @@ class IncidentSchema(Schema):
 class IncidentStatusSchema(Schema):
     # Represents the schema for incidents status edit
     type = fields.Str(required=True, validate=(verifyType))
+    title = fields.Str(required=True, validate=(required))
     comment = fields.Str(required=True, validate=(required))
     location = fields.Str(required=True, validate=(required))
     id = fields.Int(required=False)
@@ -57,7 +59,8 @@ def create_redflag(identity):
                 "status": 400}), 400
 
         return create_incident(identity, data, 'red-flag')
-    return error_response(403, "Administrator cannot create an incident record")
+    return error_response(
+        403, "Administrator cannot create an incident record")
 
 
 @api.route('/interventions', methods=['POST'])
@@ -73,14 +76,15 @@ def create_intervension(identity):
                 "status": 400}), 400
 
         return create_incident(identity, data, 'intervention')
-    return error_response(403, "Administrator cannot create an incident record")
+    return error_response(
+        403, "Administrator cannot create an incident record")
 
 
 def create_incident(identity, data, type):
     # creating an incident
     createdBy = identity
     status = 'draft'
-    incident = Incident(createdBy, type, data['location'],
+    incident = Incident(createdBy, type, data['title'], data['location'],
                         status,
                         data['Images'], data['Videos'], data['comment'])
     response = incident.create_incident()
@@ -101,6 +105,13 @@ def get_redflags(identity):
     return get_incidents('red-flag', identity)
 
 
+@api.route('/incidents', methods=['GET'])
+@authenticate
+def get_all(identity):
+    # getting all incidents
+    return get_all_incidents(identity)
+
+
 def get_incidents(type, identity):
     incidents = ()
 
@@ -110,6 +121,29 @@ def get_incidents(type, identity):
     else:
         cur.execute(
             "select * from incidents where type = '{}' and createdBy = '{}'".format(type, identity))
+        incidents = cur.fetchall()
+
+    if not incidents:
+        return jsonify({
+            "status": 404,
+            "message": "There are no " + type + "s"
+        }), 404
+
+    return jsonify({
+        "status": 200,
+        "data": incidents
+    }), 200
+
+
+def get_all_incidents(identity):
+    incidents = ()
+
+    if isAdmin(identity):
+        cur.execute("select * from incidents")
+        incidents = cur.fetchall()
+    else:
+        cur.execute(
+            "select * from incidents where createdBy = '{}'".format(identity))
         incidents = cur.fetchall()
 
     if not incidents:
@@ -154,7 +188,8 @@ def edit_redflag_status(identity, redflag_id):
             'red-flag',
             identity)
     else:
-        return error_response(403, "You do not have permissions to access this record")
+        return error_response(
+            403, "You do not have permissions to access this record")
 
 
 @api.route('/interventions/<int:intervention_id>/status', methods=['PATCH'])
@@ -187,7 +222,8 @@ def edit_intervention_status(identity, intervention_id):
             identity)
 
     else:
-        return error_response(403, "You do not have permissions to access this record")
+        return error_response(
+            403, "You do not have permissions to access this record")
 
 
 @api.route('/redflags/<int:redflag_id>/location', methods=['PATCH'])
@@ -317,27 +353,9 @@ def edit_incident(update_type, incident_id, update_record, type, indentity):
         return jsonify({"status": 200, "message": "Updated " +
                         incident['type'] + " record's " + update_type}), 200
     else:
-        return error_response(403, "You do not have permissions to access this record")
+        return error_response(
+            403, "You do not have permissions to access this record")
 
-
-@api.route('/redflags/<int:redflag_id>', methods=['GET'])
-@authenticate
-def get_single_redflag(identity, redflag_id):
-    # getting a single redflag
-    if verified(identity):
-        return get_single_incident(redflag_id, 'red-flag')
-    else:
-        return error_response(403, "You do not have permissions to access this record")
-
-
-@api.route('/interventions/<int:intervention_id>', methods=['GET'])
-@authenticate
-def get_single_intervention(identity, intervention_id):
-    # getting a intervention redflag
-    if verified(identity):
-        return get_single_incident(intervention_id, 'intervention')
-    else:
-        return error_response(403, "You do not have permissions to access this record")
 
 
 def get_single_incident(incident_id, type):
@@ -364,7 +382,8 @@ def delete_redflag(identity, redflags_id):
     if verified(identity):
         return delete_incident(redflags_id, 'red-flag')
     else:
-        return error_response(403, "You do not have permissions to access this record")
+        return error_response(
+            403, "You do not have permissions to access this record")
 
 
 @api.route('/interventions/<int:intervention_id>', methods=['DELETE'])
@@ -374,7 +393,8 @@ def delete_intervention(identity, intervention_id):
     if verified(identity):
         return delete_incident(intervention_id, 'intervention')
     else:
-        return error_response(403, "You do not have permissions to access this record")
+        return error_response(
+            403, "You do not have permissions to access this record")
 
 
 def delete_incident(incident_id, type):
@@ -433,7 +453,29 @@ def sendEmail(user_id, incident_type, status):
     except BaseException:
         print('email failed to send')
 
-        
+
+@api.route('/redflags/<int:redflag_id>', methods=['GET'])
+@authenticate
+def get_single_redflag(identity, redflag_id):
+    # getting a single redflag
+    if verified(identity):
+        return get_single_incident(redflag_id, 'red-flag')
+    else:
+        return error_response(
+            403, "You do not have permissions to access this record")
+
+
+@api.route('/interventions/<int:intervention_id>', methods=['GET'])
+@authenticate
+def get_single_intervention(identity, intervention_id):
+    # getting a intervention redflag
+    if verified(identity):
+        return get_single_incident(intervention_id, 'intervention')
+    else:
+        return error_response(
+            403, "You do not have permissions to access this record")
+
+
 @api.route('/incidents/<int:incident_id>', methods=['PATCH'])
 @authenticate
 def edit_any_incident(indentity, incident_id):
@@ -463,57 +505,31 @@ def edit_any_incident(indentity, incident_id):
     else:
         return error_response(
             403, "You do not have permissions to access this record")
-    
-    
-@api.route('/incidents', methods=['GET'])
-@authenticate
-def get_all(identity):
-    # getting all incidents
-    return get_all_incidents(identity)
 
 
-def get_all_incidents(identity):
-    incidents = ()
-
-    if isAdmin(identity):
-        cur.execute("select * from incidents")
-        incidents = cur.fetchall()
-    else:
-        cur.execute(
-            "select * from incidents where createdBy = '{}'".format(identity))
-        incidents = cur.fetchall()
-
-    if not incidents:
-        return jsonify({
-            "status": 404,
-            "message": "There are no records found"
-        }), 404
-
-    return jsonify({
-        "status": 200,
-        "data": incidents
-    }), 200
-        
-        
 @app.errorhandler(404)
 def not_found(error):
     '''404 Error function'''
-    return (jsonify({'error': 'Sorry :( We could not find what you are looking for.'}), 404)
+    return (jsonify(
+        {'error': 'Sorry :( We could not find what you are looking for.'}), 404)
 
 
 @app.errorhandler(400)
 def bad_request(error):
     '''400 Error function'''
-    return (jsonify({'error': 'Error in the payload. Please verify that your payload is in the correct format'}), 400)
+    return (jsonify(
+        {'error': 'Error in the payload. Please verify that your payload is in the correct format'}), 400)
 
 
 @app.errorhandler(405)
 def method_not_allowed(error):
     '''405 Error function'''
-    return (jsonify({'error': 'The method provided is not allowed for the endpoint used.'}), 405)
+    return (jsonify(
+        {'error': 'The method provided is not allowed for the endpoint used.'}), 405)
 
 
 @app.errorhandler(500)
 def server_error(error):
     '''405 Error function'''
-    return (jsonify({'error': 'Oops! Something happened :( Internal server error.'}), 500)
+    return (
+        jsonify({'error': 'Oops! Something happened :( Internal server error.'}), 500)

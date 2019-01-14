@@ -9,10 +9,11 @@ cur = conn.cursor(cursor_factory=RealDictCursor)
 
 class Incident:
     # incident class
-    def __init__(self, createdBy, type, location,
+    def __init__(self, createdBy, type, title, location,
                  status, Images, Videos, comment):
         self.createdBy = createdBy
         self.type = type
+        self.title = title
         self.location = location
         self.status = status
         self.Images = Images
@@ -22,9 +23,10 @@ class Incident:
     def create_incident(self):
         # creating an incident
         cur.execute(
-            "INSERT INTO incidents(createdBy, type, location, status, Images, Videos, comment) values('{}','{}','{}','{}','{}','{}','{}')".format(
+            "INSERT INTO incidents(createdBy, type, title, location, status, Images, Videos, comment) values('{}','{}','{}','{}','{}','{}','{}', '{}')".format(
                 self.createdBy,
                 self.type,
+                self.title,
                 self.location,
                 self.status,
                 self.Images,
