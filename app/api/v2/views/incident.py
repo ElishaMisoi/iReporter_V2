@@ -486,7 +486,7 @@ def get_all_incidents(identity):
     if not incidents:
         return jsonify({
             "status": 404,
-            "message": "There are no " + type + "s"
+            "message": "There are no records found"
         }), 404
 
     return jsonify({
