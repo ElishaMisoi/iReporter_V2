@@ -24,6 +24,7 @@ QUERIES = [
           createdOn TIMESTAMP WITHOUT TIME ZONE DEFAULT (NOW() AT TIME ZONE 'utc'),
           createdBy INT REFERENCES users(id),
           type VARCHAR NOT NULL,
+          title VARCHAR NOT NULL,
           location VARCHAR NOT NULL,
           status VARCHAR NOT NULL,
           Images VARCHAR NULL,

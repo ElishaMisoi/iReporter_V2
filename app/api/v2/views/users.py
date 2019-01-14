@@ -45,7 +45,7 @@ def create_user():
 
     if errors:
         return jsonify({
-            "errors": errors,
+            "message": errors,
             "status": 400}), 400
 
     cur.execute(
@@ -88,7 +88,7 @@ def login_user():
 
     if errors:
         return jsonify({
-            "errors": errors,
+            "message": errors,
             "status": 400}), 400
 
     user = User(data['email'], data['password'])

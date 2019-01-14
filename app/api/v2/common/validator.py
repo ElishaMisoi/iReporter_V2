@@ -30,11 +30,11 @@ def verifyStatus(value):
         if not value.strip(' '):
             raise ValidationError('Status cannot be null')
 
-    statuses = ['accepted', 'rejected', 'under investigation', 'draft']
+    statuses = ['resolved', 'rejected', 'under investigation', 'draft']
 
     if value not in statuses:
         raise ValidationError(
-            'The status can only be accepted, rejected, under investigation or draft')
+            'The status can only be resolved, rejected, under investigation or draft')
 
     return value
 
