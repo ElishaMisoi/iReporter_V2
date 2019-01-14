@@ -15,6 +15,7 @@ class BaseTest(unittest.TestCase):
         self.incident = {
             "id": "1",
             "location": "Nairobi",
+            "title": "title",
             "status": "draft",
             "comment": "another one",
             "Images": "image1, image2",
