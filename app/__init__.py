@@ -4,8 +4,7 @@ from flask_cors import CORS
 from app.db import create_tables
 from flask import jsonify
 
-create_tables.drop_tables()
-# create_tables.create_tables()
+create_tables.create_tables()
 app = Flask(__name__)
 CORS(app)
 
