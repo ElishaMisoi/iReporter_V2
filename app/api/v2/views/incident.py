@@ -454,6 +454,28 @@ def sendEmail(user_id, incident_type, status):
         print('email failed to send')
 
 
+@api.route('/redflags/<int:redflag_id>', methods=['GET'])
+@authenticate
+def get_single_redflag(identity, redflag_id):
+    # getting a single redflag
+    if verified(identity):
+        return get_single_incident(redflag_id, 'red-flag')
+    else:
+        return error_response(
+            403, "You do not have permissions to access this record")
+
+
+@api.route('/interventions/<int:intervention_id>', methods=['GET'])
+@authenticate
+def get_single_intervention(identity, intervention_id):
+    # getting a intervention redflag
+    if verified(identity):
+        return get_single_incident(intervention_id, 'intervention')
+    else:
+        return error_response(
+            403, "You do not have permissions to access this record")
+
+
 @api.route('/incidents/<int:incident_id>', methods=['PATCH'])
 @authenticate
 def edit_any_incident(indentity, incident_id):
@@ -484,27 +506,6 @@ def edit_any_incident(indentity, incident_id):
         return error_response(
             403, "You do not have permissions to access this record")
 
-
-@api.route('/redflags/<int:redflag_id>', methods=['GET'])
-@authenticate
-def get_single_redflag(identity, redflag_id):
-    # getting a single redflag
-    if verified(identity):
-        return get_single_incident(redflag_id, 'red-flag')
-    else:
-        return error_response(
-            403, "You do not have permissions to access this record")
-
-
-@api.route('/interventions/<int:intervention_id>', methods=['GET'])
-@authenticate
-def get_single_intervention(identity, intervention_id):
-    # getting a intervention redflag
-    if verified(identity):
-        return get_single_incident(intervention_id, 'intervention')
-    else:
-        return error_response(
-            403, "You do not have permissions to access this record")
 
 @app.errorhandler(404)
 def not_found(error):

@@ -87,6 +87,7 @@ class Test_Incident(BaseTest):
         redflag = {
             "id": "1",
             "location": "Nairobi",
+            "title": "title",
             "status": "draft",
             "comment": "another one",
             "Images": "image1, image2",
@@ -113,6 +114,7 @@ class Test_Incident(BaseTest):
         intervention = {
             "id": "1",
             "location": "Nairobi",
+            "title": "title",
             "status": "draft",
             "comment": "another one",
             "Images": "image1, image2",
@@ -139,6 +141,7 @@ class Test_Incident(BaseTest):
         redflag = {
             "id": "1",
             "location": "Nairobi",
+            "title": "title",
             "status": "draft",
             "comment": "another one",
             "Images": "image1, image2",
@@ -162,6 +165,7 @@ class Test_Incident(BaseTest):
         intervention = {
             "id": "1",
             "location": "Nairobi",
+            "title": "title",
             "status": "draft",
             "comment": "another one",
             "Images": "image1, image2",
@@ -186,6 +190,7 @@ class Test_Incident(BaseTest):
         redflag = {
             "id": "1",
             "location": "Nairobi",
+            "title": "title",
             "status": "draft",
             "comment": "another one",
             "Images": "image1, image2",
@@ -210,6 +215,7 @@ class Test_Incident(BaseTest):
         intervention = {
             "id": "1",
             "location": "Nairobi",
+            "title": "title",
             "status": "draft",
             "comment": "another one",
             "Images": "image1, image2",
@@ -289,6 +295,7 @@ class Test_Incident(BaseTest):
         # admin = False
         user_details = {
             "firstname": "test_firstn",
+            "title": "title",
             "lastname": "test_lastname",
             "othernames": "test_othernames",
             "email": "not_admin@email.com",
@@ -319,6 +326,7 @@ class Test_Incident(BaseTest):
         redflag = {
             "id": "1",
             "location": "Nairobi",
+            "title": "title",
             "status": "draft",
             "Images": "image1, image2",
             "Videos": "video1, video2",
@@ -337,6 +345,7 @@ class Test_Incident(BaseTest):
         redflag = {
             "id": "1",
             "location": "Nairobi",
+            "title": "title",
             "status": "draft",
             "Images": "image1, image2",
             "Videos": "video1, video2",
@@ -354,6 +363,7 @@ class Test_Incident(BaseTest):
         token = self.user_auth_token()
         redflag = {
             "id": "1",
+            "title": "title",
             "comment": "test comment",
             "status": "draft",
             "Images": "image1, image2",
@@ -372,6 +382,7 @@ class Test_Incident(BaseTest):
         token = self.user_auth_token()
         redflag = {
             "id": "1",
+            "title": "title",
             "comment": "another one",
             "Images": "image1, image2",
             "status": "draft",
@@ -391,6 +402,7 @@ class Test_Incident(BaseTest):
         intervention = {
             "id": "1",
             "location": "Nairobi",
+            "title": "title",
             "comment": "another one",
             "Images": "image1, image2",
             "Videos": "video1, video2",
@@ -410,6 +422,7 @@ class Test_Incident(BaseTest):
         intervention = {
             "id": "1",
             "location": "Nairobi",
+            "title": "title",
             "status": "draft",
             "comment": "another one",
             "Images": "image1, image2",
@@ -429,6 +442,7 @@ class Test_Incident(BaseTest):
         redflag = {
             "id": "1",
             "location": "Nairobi",
+            "title": "title",
             "status": "draft",
             "comment": "another one",
             "Images": "image1, image2",
@@ -448,6 +462,7 @@ class Test_Incident(BaseTest):
         intervention = {
             "id": "1",
             "location": "Nairobi",
+            "title": "title",
             "status": "draft",
             "comment": "another one",
             "Images": "image1, image2",
@@ -467,6 +482,7 @@ class Test_Incident(BaseTest):
         redflag = {
             "id": "1",
             "location": "Nairobi",
+            "title": "title",
             "status": "draft",
             "comment": "another one",
             "Images": "image1, image2",
@@ -486,6 +502,7 @@ class Test_Incident(BaseTest):
         intervention = {
             "id": "1",
             "location": "Nairobi",
+            "title": "title",
             "status": "draft",
             "comment": "another one",
             "Images": "image1, image2",
@@ -509,6 +526,7 @@ class Test_Incident(BaseTest):
         redflag = {
             "id": "1",
             "location": "Nairobi",
+            "title": "title",
             "status": "draft",
             "comment": "another one",
             "Images": "image1, image2",
