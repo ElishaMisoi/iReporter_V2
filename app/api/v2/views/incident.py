@@ -472,15 +472,15 @@ def get_all(identity):
     return get_all_incidents(identity)
 
 
-def get_incidents(type, identity):
+def get_all_incidents(identity):
     incidents = ()
 
     if isAdmin(identity):
-        cur.execute("select * from incidents where type = '{}'".format(type))
+        cur.execute("select * from incidents")
         incidents = cur.fetchall()
     else:
         cur.execute(
-            "select * from incidents where type = '{}' and createdBy = '{}'".format(type, identity))
+            "select * from incidents where createdBy = '{}'".format(identity))
         incidents = cur.fetchall()
 
     if not incidents:
