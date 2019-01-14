@@ -463,6 +463,36 @@ def edit_any_incident(indentity, incident_id):
     else:
         return error_response(
             403, "You do not have permissions to access this record")
+    
+    
+@api.route('/incidents', methods=['GET'])
+@authenticate
+def get_all(identity):
+    # getting all incidents
+    return get_all_incidents(identity)
+
+
+def get_incidents(type, identity):
+    incidents = ()
+
+    if isAdmin(identity):
+        cur.execute("select * from incidents where type = '{}'".format(type))
+        incidents = cur.fetchall()
+    else:
+        cur.execute(
+            "select * from incidents where type = '{}' and createdBy = '{}'".format(type, identity))
+        incidents = cur.fetchall()
+
+    if not incidents:
+        return jsonify({
+            "status": 404,
+            "message": "There are no " + type + "s"
+        }), 404
+
+    return jsonify({
+        "status": 200,
+        "data": incidents
+    }), 200
         
         
 @app.errorhandler(404)
