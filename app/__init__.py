@@ -4,6 +4,7 @@ from app.db import create_tables
 from flask import jsonify
 from flask_cors import CORS
 
+create_tables.create_tables()
 create_tables.create_super_admin()
 app = Flask(__name__)
 CORS(app)
