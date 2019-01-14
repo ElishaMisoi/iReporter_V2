@@ -6,6 +6,7 @@ from flask import jsonify
 
 create_tables.create_tables()
 app = Flask(__name__)
+CORS(app)
 
 
 @app.errorhandler(404)
